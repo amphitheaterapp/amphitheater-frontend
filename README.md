@@ -1,2 +1,3 @@
 # amphitheater-frontend
-Next.js frontend: Amphitheater web client
+
+Next.js frontend: Amphitheater web client.
