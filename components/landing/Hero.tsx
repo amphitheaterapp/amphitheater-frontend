@@ -1,6 +1,49 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+
 export default function Hero() {
+    const tagRef = useRef<HTMLParagraphElement>(null);
+    const headRef = useRef<HTMLHeadingElement>(null);
+    const subRef = useRef<HTMLParagraphElement>(null);
+    const ctaRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const tl = gsap.timeline({ delay: 0.3 });
+
+        tl.fromTo(
+            tagRef.current,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+        )
+            .fromTo(
+                headRef.current,
+                { opacity: 0, y: 40 },
+                { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
+                "-=0.4",
+            )
+            .fromTo(
+                subRef.current,
+                { opacity: 0, y: 24 },
+                { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+                "-=0.5",
+            )
+            .fromTo(
+                ctaRef.current,
+                { opacity: 0, y: 16 },
+                { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+                "-=0.4",
+            )
+            .fromTo(
+                scrollRef.current,
+                { opacity: 0 },
+                { opacity: 1, duration: 0.6, ease: "power2.out" },
+                "-=0.2",
+            );
+    }, []);
+
     return (
         <section
             style={{
@@ -26,19 +69,22 @@ export default function Hero() {
             />
 
             <p
+                ref={tagRef}
                 style={{
                     fontFamily: "var(--font-body)",
                     fontSize: "11px",
                     letterSpacing: "0.4em",
-                    textTransform: "uppercase",
+                    textTransform: "lowercase",
                     color: "var(--gold)",
                     marginBottom: "24px",
+                    opacity: 0,
                 }}
             >
-                The Verified Creative Network
+                the verified creative network
             </p>
 
             <h1
+                ref={headRef}
                 style={{
                     fontFamily: "var(--font-display)",
                     fontSize: "clamp(52px, 9vw, 128px)",
@@ -48,16 +94,18 @@ export default function Hero() {
                     color: "var(--cream)",
                     marginBottom: "32px",
                     maxWidth: "1000px",
+                    opacity: 0,
                 }}
             >
-                Find your team.
+                find your team.
                 <br />
                 <em style={{ fontStyle: "italic", color: "var(--cream-dim)" }}>
-                    Build your record.
+                    build your record.
                 </em>
             </h1>
 
             <p
+                ref={subRef}
                 style={{
                     fontFamily: "var(--font-body)",
                     fontSize: "13px",
@@ -65,14 +113,24 @@ export default function Hero() {
                     lineHeight: 1.8,
                     maxWidth: "480px",
                     marginBottom: "48px",
+                    textTransform: "lowercase",
+                    opacity: 0,
                 }}
             >
-                Amphitheater connects every discipline of film, television,
-                theatre, music, and content production. Verified identities.
-                Permanent credited work history. No noise.
+                amphitheater connects every discipline of film, television,
+                theatre, music, and content production. verified identities.
+                permanent credited work history. no noise.
             </p>
 
-            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+            <div
+                ref={ctaRef}
+                style={{
+                    display: "flex",
+                    gap: "16px",
+                    alignItems: "center",
+                    opacity: 0,
+                }}
+            >
                 <button
                     style={{
                         fontFamily: "var(--font-body)",
@@ -107,6 +165,7 @@ export default function Hero() {
             </div>
 
             <div
+                ref={scrollRef}
                 style={{
                     position: "absolute",
                     bottom: "40px",
@@ -116,6 +175,7 @@ export default function Hero() {
                     flexDirection: "column",
                     alignItems: "center",
                     gap: "8px",
+                    opacity: 0,
                 }}
             >
                 <span
