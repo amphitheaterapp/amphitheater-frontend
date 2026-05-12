@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 import gsap from "gsap";
+import { link } from "fs";
 
 export default function Hero() {
     const tagRef = useRef<HTMLParagraphElement>(null);
@@ -9,6 +10,18 @@ export default function Hero() {
     const subRef = useRef<HTMLParagraphElement>(null);
     const ctaRef = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const linkStyle: CSSProperties = {
+        fontFamily: "var(--font-body)",
+        fontSize: "11px",
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        background: "transparent",
+        color: "var(--cream-dim)",
+        border: "1px solid rgba(240,234,216,0.2)",
+        padding: "16px 32px",
+        cursor: "pointer",
+    };
 
     useEffect(() => {
         const tl = gsap.timeline({ delay: 0.3 });
@@ -147,21 +160,9 @@ export default function Hero() {
                 >
                     Request Early Access
                 </button>
-                <button
-                    style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "11px",
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                        background: "transparent",
-                        color: "var(--cream-dim)",
-                        border: "1px solid rgba(240,234,216,0.2)",
-                        padding: "16px 32px",
-                        cursor: "pointer",
-                    }}
-                >
-                    See How It Works
-                </button>
+                <a href="#how-it-works" style={linkStyle}>
+                    See how it works
+                </a>
             </div>
 
             <div
