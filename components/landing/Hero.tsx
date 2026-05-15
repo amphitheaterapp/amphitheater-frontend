@@ -2,7 +2,6 @@
 
 import { CSSProperties, useEffect, useRef } from "react";
 import gsap from "gsap";
-import { link } from "fs";
 
 export default function Hero() {
     const tagRef = useRef<HTMLParagraphElement>(null);
