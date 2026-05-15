@@ -3,6 +3,8 @@ import { Cormorant_Garamond, DM_Mono } from "next/font/google";
 // @ts-ignore
 import "./globals.css";
 
+import { AuthProvider } from "@/context/AuthContext";
+
 const cormorant = Cormorant_Garamond({
     subsets: ["latin"],
     weight: ["300", "400", "500", "600", "700"],
@@ -30,8 +32,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className={`${cormorant.variable} ${dmMono.variable}`}>
-            <body>{children}</body>
+        <html lang="en">
+            <body>
+                <AuthProvider>{children}</AuthProvider>
+            </body>
         </html>
     );
 }
