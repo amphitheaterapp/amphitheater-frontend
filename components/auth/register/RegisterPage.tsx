@@ -14,6 +14,7 @@ import ActorDetailsForm from "./ActorDetailsForm";
 export type BasicDetails = {
     email: string;
     password: string;
+    confirm_password: string;
     name: string;
     dob: string;
     phone_number: string;

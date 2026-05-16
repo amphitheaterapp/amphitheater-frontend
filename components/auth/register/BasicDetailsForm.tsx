@@ -43,17 +43,36 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
         location: "",
     });
 
+    const [error, setError] = useState("");
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (form.password !== form.confirm_password) {
+            setError("Passwords do not match.");
+            return;
+        }
         onSubmit(form);
     };
 
     return (
         <>
+            {error && (
+                <p
+                    style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "11px",
+                        color: "#e57373",
+                        marginBottom: "16px",
+                        letterSpacing: "0.05em",
+                    }}
+                >
+                    {error}
+                </p>
+            )}
             <p
                 style={{
                     fontFamily: "var(--font-body)",
