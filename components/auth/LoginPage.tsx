@@ -48,9 +48,11 @@ export default function LoginPage() {
                 }}
             >
                 {/* Animated Logo */}
-                <div style={{ marginBottom: "16px" }}>
-                    <AnimatedLogo />
-                </div>
+                <a href="/">
+                    <div style={{ marginBottom: "16px" }}>
+                        <AnimatedLogo />
+                    </div>
+                </a>
 
                 {/* Wordmark */}
                 <a
