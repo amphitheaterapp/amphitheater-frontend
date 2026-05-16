@@ -162,7 +162,7 @@ export default function RegisterPage() {
                 <div
                     style={{
                         width: "100%",
-                        maxWidth: "480px",
+                        maxWidth: "680px",
                         border: "1px solid rgba(212,185,106,0.3)",
                         padding: "48px 40px",
                         background: "rgba(9,11,54,0.6)",

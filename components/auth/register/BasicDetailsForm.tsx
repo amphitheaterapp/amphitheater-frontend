@@ -102,78 +102,140 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
             <form
                 onSubmit={handleSubmit}
                 style={{
-                    display: "flex",
-                    flexDirection: "column",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
                     gap: "28px",
                 }}
             >
-                {[
-                    { label: "Full Name", name: "name", type: "text" },
-                    { label: "Email", name: "email", type: "email" },
-                    { label: "Password", name: "password", type: "password" },
-                    {
-                        label: "Confirm Password",
-                        name: "confirm_password",
-                        type: "password",
-                    },
-                ].map(({ label, name, type }) => (
-                    <div
-                        key={name}
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                        }}
-                    >
-                        <label style={labelStyle}>{label}</label>
-                        <input
-                            type={type}
-                            name={name}
-                            value={form[name as keyof BasicDetails]}
-                            onChange={handleChange}
-                            required
-                            style={inputStyle}
-                        />
-                    </div>
-                ))}
+                {/* Full width fields */}
+                <div
+                    style={{
+                        gridColumn: "1 / -1",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                    }}
+                >
+                    <label style={labelStyle}>Full Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
 
-                <DatePicker
-                    value={form.dob}
-                    onChange={(v) => setForm((prev) => ({ ...prev, dob: v }))}
-                />
+                <div
+                    style={{
+                        gridColumn: "1 / -1",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                    }}
+                >
+                    <label style={labelStyle}>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
 
-                {[
-                    {
-                        label: "Phone Number",
-                        name: "phone_number",
-                        type: "tel",
-                    },
-                    { label: "Location", name: "location", type: "text" },
-                ].map(({ label, name, type }) => (
-                    <div
-                        key={name}
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                        }}
-                    >
-                        <label style={labelStyle}>{label}</label>
-                        <input
-                            type={type}
-                            name={name}
-                            value={form[name as keyof BasicDetails]}
-                            onChange={handleChange}
-                            required
-                            style={inputStyle}
-                        />
-                    </div>
-                ))}
+                {/* Side by side */}
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                    }}
+                >
+                    <label style={labelStyle}>Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
 
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                    }}
+                >
+                    <label style={labelStyle}>Confirm Password</label>
+                    <input
+                        type="password"
+                        name="confirm_password"
+                        value={form.confirm_password}
+                        onChange={handleChange}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
+
+                {/* Full width */}
+                <div style={{ gridColumn: "1 / -1" }}>
+                    <DatePicker
+                        value={form.dob}
+                        onChange={(v) =>
+                            setForm((prev) => ({ ...prev, dob: v }))
+                        }
+                    />
+                </div>
+
+                {/* Side by side */}
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                    }}
+                >
+                    <label style={labelStyle}>Phone Number</label>
+                    <input
+                        type="tel"
+                        name="phone_number"
+                        value={form.phone_number}
+                        onChange={handleChange}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
+
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                    }}
+                >
+                    <label style={labelStyle}>Location</label>
+                    <input
+                        type="text"
+                        name="location"
+                        value={form.location}
+                        onChange={handleChange}
+                        required
+                        style={inputStyle}
+                    />
+                </div>
+
+                {/* Full width button */}
                 <button
                     type="submit"
                     disabled={isLoading}
                     style={{
+                        gridColumn: "1 / -1",
                         marginTop: "8px",
                         fontFamily: "var(--font-body)",
                         fontSize: "11px",
@@ -196,6 +258,7 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
 
             <p
                 style={{
+                    gridColumn: "1 / -1",
                     fontFamily: "var(--font-body)",
                     fontSize: "11px",
                     color: "var(--cream-muted)",
@@ -210,7 +273,6 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
                     style={{
                         color: "var(--gold-accent)",
                         textDecoration: "none",
-                        letterSpacing: "0.1em",
                     }}
                 >
                     sign in
