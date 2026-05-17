@@ -4,6 +4,9 @@
 
 import { useState } from "react";
 import api from "@/lib/axios";
+import Dropdown from "@/components/common/Dropdown";
+import TagInput from "@/components/common/TagInput";
+import Toggle from "@/components/common/Toggle";
 
 const inputStyle = {
     background: "transparent",
@@ -25,13 +28,7 @@ const labelStyle = {
     color: "var(--cream-muted)",
 };
 
-const selectStyle = {
-    ...inputStyle,
-    cursor: "pointer",
-};
-
 interface ActorData {
-    // Core
     union_status: string;
     age_range_min: string;
     age_range_max: string;
@@ -41,7 +38,6 @@ interface ActorData {
     willing_to_travel: boolean;
     has_valid_passport: boolean;
     nudity_comfort: string;
-    // Physical
     height_cm: string;
     weight_kg: string;
     eye_color: string;
@@ -53,7 +49,6 @@ interface ActorData {
     facial_hair: string;
     visible_tattoos: boolean;
     visible_piercings: boolean;
-    // Performance
     dance_styles: string[];
     instrument_skills: string[];
     combat_styles: string[];
@@ -62,7 +57,6 @@ interface ActorData {
     stunt_certified: boolean;
     has_vehicle: boolean;
     can_drive_manual: boolean;
-    // Links
     reel_url: string;
     imdb_url: string;
     representation: string;
@@ -134,150 +128,6 @@ function Collapsible({ title, children }: CollapsibleProps) {
                     {children}
                 </div>
             )}
-        </div>
-    );
-}
-
-function TagInput({
-    label,
-    value,
-    onChange,
-}: {
-    label: string;
-    value: string[];
-    onChange: (val: string[]) => void;
-}) {
-    const [input, setInput] = useState("");
-
-    const add = () => {
-        const trimmed = input.trim();
-        if (trimmed && !value.includes(trimmed)) {
-            onChange([...value, trimmed]);
-        }
-        setInput("");
-    };
-
-    const remove = (item: string) => {
-        onChange(value.filter((v) => v !== item));
-    };
-
-    return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={labelStyle}>{label}</label>
-            <div style={{ display: "flex", gap: "8px" }}>
-                <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) =>
-                        e.key === "Enter" && (e.preventDefault(), add())
-                    }
-                    style={{ ...inputStyle, flex: 1 }}
-                    placeholder="type and press enter"
-                />
-                <button
-                    type="button"
-                    onClick={add}
-                    style={{
-                        background: "transparent",
-                        border: "1px solid rgba(212,185,106,0.3)",
-                        color: "var(--gold-accent)",
-                        fontFamily: "var(--font-body)",
-                        fontSize: "11px",
-                        padding: "4px 12px",
-                        cursor: "pointer",
-                    }}
-                >
-                    add
-                </button>
-            </div>
-            {value.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                    {value.map((item) => (
-                        <span
-                            key={item}
-                            style={{
-                                fontFamily: "var(--font-body)",
-                                fontSize: "10px",
-                                letterSpacing: "0.1em",
-                                color: "var(--cream)",
-                                border: "1px solid rgba(212,185,106,0.3)",
-                                padding: "4px 10px",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                            }}
-                        >
-                            {item}
-                            <button
-                                type="button"
-                                onClick={() => remove(item)}
-                                style={{
-                                    background: "transparent",
-                                    border: "none",
-                                    color: "var(--cream-muted)",
-                                    cursor: "pointer",
-                                    padding: 0,
-                                    fontSize: "12px",
-                                }}
-                            >
-                                ×
-                            </button>
-                        </span>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-function Toggle({
-    label,
-    value,
-    onChange,
-}: {
-    label: string;
-    value: boolean;
-    onChange: (val: boolean) => void;
-}) {
-    return (
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-            }}
-        >
-            <label style={labelStyle}>{label}</label>
-            <button
-                type="button"
-                onClick={() => onChange(!value)}
-                style={{
-                    width: "40px",
-                    height: "20px",
-                    borderRadius: "10px",
-                    background: value
-                        ? "var(--gold-accent)"
-                        : "rgba(212,185,106,0.15)",
-                    border: "none",
-                    cursor: "pointer",
-                    position: "relative",
-                    transition: "background 0.2s ease",
-                }}
-            >
-                <span
-                    style={{
-                        position: "absolute",
-                        top: "2px",
-                        left: value ? "22px" : "2px",
-                        width: "16px",
-                        height: "16px",
-                        borderRadius: "50%",
-                        background: "var(--ink)",
-                        transition: "left 0.2s ease",
-                    }}
-                />
-            </button>
         </div>
     );
 }
@@ -418,27 +268,18 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     gap: "28px",
                 }}
             >
-                {/* ── Core fields ── */}
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "8px",
-                    }}
-                >
-                    <label style={labelStyle}>Union Status</label>
-                    <select
-                        value={form.union_status}
-                        onChange={(e) => set("union_status", e.target.value)}
-                        style={selectStyle}
-                    >
-                        <option value="">Select</option>
-                        <option value="sag_aftra">SAG-AFTRA</option>
-                        <option value="iatse">IATSE</option>
-                        <option value="non_union">Non-Union</option>
-                        <option value="fi_core">Fi-Core</option>
-                    </select>
-                </div>
+                {/*  Core  */}
+                <Dropdown
+                    options={[
+                        { label: "SAG-AFTRA", value: "sag_aftra" },
+                        { label: "IATSE", value: "iatse" },
+                        { label: "Non-Union", value: "non_union" },
+                        { label: "Fi-Core", value: "fi_core" },
+                    ]}
+                    value={form.union_status}
+                    onChange={(v) => set("union_status", String(v))}
+                    placeholder="Union Status"
+                />
 
                 <div style={{ display: "flex", gap: "16px" }}>
                     <div
@@ -484,13 +325,11 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     value={form.languages}
                     onChange={(v) => set("languages", v)}
                 />
-
                 <TagInput
                     label="Accents"
                     value={form.accents}
                     onChange={(v) => set("accents", v)}
                 />
-
                 <TagInput
                     label="Special Skills"
                     value={form.special_skills}
@@ -502,34 +341,25 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     value={form.willing_to_travel}
                     onChange={(v) => set("willing_to_travel", v)}
                 />
-
                 <Toggle
                     label="Has Valid Passport"
                     value={form.has_valid_passport}
                     onChange={(v) => set("has_valid_passport", v)}
                 />
 
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "8px",
-                    }}
-                >
-                    <label style={labelStyle}>Nudity Comfort</label>
-                    <select
-                        value={form.nudity_comfort}
-                        onChange={(e) => set("nudity_comfort", e.target.value)}
-                        style={selectStyle}
-                    >
-                        <option value="none">None</option>
-                        <option value="implied">Implied</option>
-                        <option value="partial">Partial</option>
-                        <option value="full">Full</option>
-                    </select>
-                </div>
+                <Dropdown
+                    options={[
+                        { label: "None", value: "none" },
+                        { label: "Implied", value: "implied" },
+                        { label: "Partial", value: "partial" },
+                        { label: "Full", value: "full" },
+                    ]}
+                    value={form.nudity_comfort}
+                    onChange={(v) => set("nudity_comfort", String(v))}
+                    placeholder="Nudity Comfort"
+                />
 
-                {/* ── Physical ── */}
+                {/*  Physical  */}
                 <Collapsible title="Physical Attributes">
                     <div style={{ display: "flex", gap: "16px" }}>
                         <div
@@ -570,147 +400,163 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                         </div>
                     </div>
 
-                    {[
-                        {
-                            label: "Eye Color",
-                            key: "eye_color",
-                            options: [
-                                "brown",
-                                "blue",
-                                "hazel",
-                                "amber",
-                                "gray",
-                                "green",
-                                "violet",
-                                "red",
-                                "black",
-                            ],
-                        },
-                        {
-                            label: "Hair Color",
-                            key: "hair_color",
-                            options: [
-                                "black",
-                                "dark_brown",
-                                "brown",
-                                "light_brown",
-                                "dirty_blonde",
-                                "blonde",
-                                "platinum_blonde",
-                                "strawberry_blonde",
-                                "auburn",
-                                "red",
-                                "gray",
-                                "white",
-                                "salt_and_pepper",
-                                "other",
-                            ],
-                        },
-                        {
-                            label: "Hair Length",
-                            key: "hair_length",
-                            options: [
-                                "bald",
-                                "buzzed",
-                                "short",
-                                "ear_length",
-                                "chin_length",
-                                "shoulder_length",
-                                "armpit_length",
-                                "mid_back_length",
-                                "waist_length",
-                                "hip_length",
-                                "tailbone_length",
-                                "floor_length",
-                            ],
-                        },
-                        {
-                            label: "Body Type",
-                            key: "body_type",
-                            options: [
-                                "thin",
-                                "slim",
-                                "slender",
-                                "average",
-                                "athletic",
-                                "toned",
-                                "muscular",
-                                "stocky",
-                                "curvy",
-                                "plus_size",
-                                "large",
-                                "heavyset",
-                            ],
-                        },
-                        {
-                            label: "Ethnicity",
-                            key: "ethnicity",
-                            options: [
-                                "american_indian_alaska_native",
-                                "asian",
-                                "black_african_american",
-                                "hispanic_latino",
-                                "middle_eastern_north_african",
-                                "native_hawaiian_pacific_islander",
-                                "white",
-                                "other",
-                                "prefer_not_to_say",
-                            ],
-                        },
-                        {
-                            label: "Skin Tone",
-                            key: "skin_tone",
-                            options: [
-                                "porcelain",
-                                "fair",
-                                "light",
-                                "medium",
-                                "tan",
-                                "olive",
-                                "brown",
-                                "dark",
-                                "deep",
-                                "ebony",
-                            ],
-                        },
-                        {
-                            label: "Facial Hair",
-                            key: "facial_hair",
-                            options: [
-                                "none",
-                                "stubble",
-                                "moustache",
-                                "goatee",
-                                "beard",
-                                "full_beard",
-                            ],
-                        },
-                    ].map(({ label, key, options }) => (
-                        <div
-                            key={key}
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                            }}
-                        >
-                            <label style={labelStyle}>{label}</label>
-                            <select
-                                value={form[key as keyof ActorData] as string}
-                                onChange={(e) =>
-                                    set(key as keyof ActorData, e.target.value)
-                                }
-                                style={selectStyle}
-                            >
-                                <option value="">Select</option>
-                                {options.map((o) => (
-                                    <option key={o} value={o}>
-                                        {o.replace(/_/g, " ")}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    ))}
+                    <Dropdown
+                        options={[
+                            { label: "Brown", value: "brown" },
+                            { label: "Blue", value: "blue" },
+                            { label: "Hazel", value: "hazel" },
+                            { label: "Amber", value: "amber" },
+                            { label: "Gray", value: "gray" },
+                            { label: "Green", value: "green" },
+                            { label: "Violet", value: "violet" },
+                            { label: "Red", value: "red" },
+                            { label: "Black", value: "black" },
+                        ]}
+                        value={form.eye_color}
+                        onChange={(v) => set("eye_color", String(v))}
+                        placeholder="Eye Color"
+                    />
+                    <Dropdown
+                        options={[
+                            { label: "Black", value: "black" },
+                            { label: "Dark Brown", value: "dark_brown" },
+                            { label: "Brown", value: "brown" },
+                            { label: "Light Brown", value: "light_brown" },
+                            { label: "Dirty Blonde", value: "dirty_blonde" },
+                            { label: "Blonde", value: "blonde" },
+                            {
+                                label: "Platinum Blonde",
+                                value: "platinum_blonde",
+                            },
+                            {
+                                label: "Strawberry Blonde",
+                                value: "strawberry_blonde",
+                            },
+                            { label: "Auburn", value: "auburn" },
+                            { label: "Red", value: "red" },
+                            { label: "Gray", value: "gray" },
+                            { label: "White", value: "white" },
+                            {
+                                label: "Salt and Pepper",
+                                value: "salt_and_pepper",
+                            },
+                            { label: "Other", value: "other" },
+                        ]}
+                        value={form.hair_color}
+                        onChange={(v) => set("hair_color", String(v))}
+                        placeholder="Hair Color"
+                    />
+                    <Dropdown
+                        options={[
+                            { label: "Bald", value: "bald" },
+                            { label: "Buzzed", value: "buzzed" },
+                            { label: "Short", value: "short" },
+                            { label: "Ear Length", value: "ear_length" },
+                            { label: "Chin Length", value: "chin_length" },
+                            {
+                                label: "Shoulder Length",
+                                value: "shoulder_length",
+                            },
+                            { label: "Armpit Length", value: "armpit_length" },
+                            {
+                                label: "Mid-Back Length",
+                                value: "mid_back_length",
+                            },
+                            { label: "Waist Length", value: "waist_length" },
+                            { label: "Hip Length", value: "hip_length" },
+                            {
+                                label: "Tailbone Length",
+                                value: "tailbone_length",
+                            },
+                            { label: "Floor Length", value: "floor_length" },
+                        ]}
+                        value={form.hair_length}
+                        onChange={(v) => set("hair_length", String(v))}
+                        placeholder="Hair Length"
+                    />
+                    <Dropdown
+                        options={[
+                            { label: "Thin", value: "thin" },
+                            { label: "Slim", value: "slim" },
+                            { label: "Slender", value: "slender" },
+                            { label: "Average", value: "average" },
+                            { label: "Athletic", value: "athletic" },
+                            { label: "Toned", value: "toned" },
+                            { label: "Muscular", value: "muscular" },
+                            { label: "Stocky", value: "stocky" },
+                            { label: "Curvy", value: "curvy" },
+                            { label: "Plus Size", value: "plus_size" },
+                            { label: "Large", value: "large" },
+                            { label: "Heavyset", value: "heavyset" },
+                        ]}
+                        value={form.body_type}
+                        onChange={(v) => set("body_type", String(v))}
+                        placeholder="Body Type"
+                    />
+                    <Dropdown
+                        options={[
+                            {
+                                label: "American Indian or Alaska Native",
+                                value: "american_indian_alaska_native",
+                            },
+                            { label: "Asian", value: "asian" },
+                            {
+                                label: "Black or African American",
+                                value: "black_african_american",
+                            },
+                            {
+                                label: "Hispanic or Latino",
+                                value: "hispanic_latino",
+                            },
+                            {
+                                label: "Middle Eastern or North African",
+                                value: "middle_eastern_north_african",
+                            },
+                            {
+                                label: "Native Hawaiian or Pacific Islander",
+                                value: "native_hawaiian_pacific_islander",
+                            },
+                            { label: "White", value: "white" },
+                            { label: "Other", value: "other" },
+                            {
+                                label: "Prefer not to say",
+                                value: "prefer_not_to_say",
+                            },
+                        ]}
+                        value={form.ethnicity}
+                        onChange={(v) => set("ethnicity", String(v))}
+                        placeholder="Ethnicity"
+                    />
+                    <Dropdown
+                        options={[
+                            { label: "Porcelain", value: "porcelain" },
+                            { label: "Fair", value: "fair" },
+                            { label: "Light", value: "light" },
+                            { label: "Medium", value: "medium" },
+                            { label: "Tan", value: "tan" },
+                            { label: "Olive", value: "olive" },
+                            { label: "Brown", value: "brown" },
+                            { label: "Dark", value: "dark" },
+                            { label: "Deep", value: "deep" },
+                            { label: "Ebony", value: "ebony" },
+                        ]}
+                        value={form.skin_tone}
+                        onChange={(v) => set("skin_tone", String(v))}
+                        placeholder="Skin Tone"
+                    />
+                    <Dropdown
+                        options={[
+                            { label: "None", value: "none" },
+                            { label: "Stubble", value: "stubble" },
+                            { label: "Moustache", value: "moustache" },
+                            { label: "Goatee", value: "goatee" },
+                            { label: "Beard", value: "beard" },
+                            { label: "Full Beard", value: "full_beard" },
+                        ]}
+                        value={form.facial_hair}
+                        onChange={(v) => set("facial_hair", String(v))}
+                        placeholder="Facial Hair"
+                    />
 
                     <Toggle
                         label="Visible Tattoos"
@@ -724,7 +570,7 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     />
                 </Collapsible>
 
-                {/* ── Performance ── */}
+                {/*  Performance  */}
                 <Collapsible title="Performance">
                     <TagInput
                         label="Dance Styles"
@@ -746,31 +592,20 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                         value={form.sport_skills}
                         onChange={(v) => set("sport_skills", v)}
                     />
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                        }}
-                    >
-                        <label style={labelStyle}>Singing Voice Type</label>
-                        <select
-                            value={form.singing_voice_type}
-                            onChange={(e) =>
-                                set("singing_voice_type", e.target.value)
-                            }
-                            style={selectStyle}
-                        >
-                            <option value="">Select</option>
-                            <option value="soprano">Soprano</option>
-                            <option value="mezzo_soprano">Mezzo-Soprano</option>
-                            <option value="contralto">Contralto</option>
-                            <option value="tenor">Tenor</option>
-                            <option value="baritone">Baritone</option>
-                            <option value="bass">Bass</option>
-                            <option value="countertenor">Countertenor</option>
-                        </select>
-                    </div>
+                    <Dropdown
+                        options={[
+                            { label: "Soprano", value: "soprano" },
+                            { label: "Mezzo-Soprano", value: "mezzo_soprano" },
+                            { label: "Contralto", value: "contralto" },
+                            { label: "Tenor", value: "tenor" },
+                            { label: "Baritone", value: "baritone" },
+                            { label: "Bass", value: "bass" },
+                            { label: "Countertenor", value: "countertenor" },
+                        ]}
+                        value={form.singing_voice_type}
+                        onChange={(v) => set("singing_voice_type", String(v))}
+                        placeholder="Singing Voice Type"
+                    />
                     <Toggle
                         label="Stunt Certified"
                         value={form.stunt_certified}
@@ -788,7 +623,7 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     />
                 </Collapsible>
 
-                {/* ── Links & Credits ── */}
+                {/*  Links & Credits  */}
                 <Collapsible title="Links & Credits">
                     {[
                         { label: "Reel URL", key: "reel_url", type: "url" },
@@ -825,7 +660,7 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     />
                 </Collapsible>
 
-                {/* ── Actions ── */}
+                {/*  Actions  */}
                 <div
                     style={{
                         display: "flex",

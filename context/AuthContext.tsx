@@ -38,7 +38,12 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const login = async (email: string, password: string) => {
         const response = await api.post("/api/v1/auth/login/", {
@@ -62,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider
             value={{ user, login, register, logout, isLoading }}
         >
-            {children}
+            {mounted ? children : null}
         </AuthContext.Provider>
     );
 }
