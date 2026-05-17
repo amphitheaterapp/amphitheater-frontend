@@ -107,9 +107,11 @@ export default function RegisterPage() {
                 }}
             >
                 {/* Logo */}
-                <div style={{ marginBottom: "16px" }}>
-                    <AnimatedLogo />
-                </div>
+                <a href="/">
+                    <div style={{ marginBottom: "16px" }}>
+                        <AnimatedLogo />
+                    </div>
+                </a>
 
                 <a
                     href="/"
