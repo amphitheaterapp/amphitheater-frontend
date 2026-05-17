@@ -8,6 +8,7 @@ const api = axios.create({
     },
 });
 
+// put csrf tokens from cookie to headers
 api.interceptors.request.use((config) => {
     if (typeof window !== "undefined") {
         const csrfToken = document.cookie
