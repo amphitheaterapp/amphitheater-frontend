@@ -14,6 +14,7 @@ interface Props {
     value: string | number;
     onChange: (value: string | number) => void;
     placeholder?: string;
+    displayValue?: string; // overrides the trigger label when provided
 }
 
 export default function Dropdown({
@@ -21,6 +22,7 @@ export default function Dropdown({
     value,
     onChange,
     placeholder = "Select",
+    displayValue,
 }: Props) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -60,7 +62,9 @@ export default function Dropdown({
                     alignItems: "center",
                 }}
             >
-                <span>{selected ? selected.label : placeholder}</span>
+                <span>
+                    {displayValue ?? (selected ? selected.label : placeholder)}
+                </span>
                 <span
                     style={{
                         color: "var(--gold-accent)",
@@ -80,7 +84,7 @@ export default function Dropdown({
                         position: "absolute",
                         top: "calc(100% + 4px)",
                         left: 0,
-                        right: 0,
+                        minWidth: "240px",
                         background: "var(--ink-mid)",
                         border: "1px solid rgba(212,185,106,0.3)",
                         maxHeight: "200px",

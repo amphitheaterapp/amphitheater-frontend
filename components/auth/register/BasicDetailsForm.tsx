@@ -6,6 +6,7 @@ import { useState } from "react";
 import { BasicDetails } from "./RegisterPage";
 
 import DatePicker from "@/components/common/DatePicker";
+import PhoneInput from "@/components/common/PhoneInput";
 
 const inputStyle = {
     background: "transparent",
@@ -201,15 +202,17 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
                         gap: "8px",
                     }}
                 >
-                    <label style={labelStyle}>Phone Number</label>
-                    <input
-                        type="tel"
-                        name="phone_number"
-                        value={form.phone_number}
-                        onChange={handleChange}
-                        required
-                        style={inputStyle}
-                    />
+                    <div style={{ gridColumn: "1 / -1" }}>
+                        <PhoneInput
+                            value={form.phone_number}
+                            onChange={(v) =>
+                                setForm((prev) => ({
+                                    ...prev,
+                                    phone_number: v,
+                                }))
+                            }
+                        />
+                    </div>
                 </div>
 
                 <div

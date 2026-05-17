@@ -50,8 +50,28 @@ export default function RegisterPage() {
             await register(data);
             setBasicDetails(data);
             setStep("role");
-        } catch {
-            setError("Registration failed. Please try again.");
+        } catch (err: any) {
+            const data = err?.response?.data;
+            console.log("Error data:", data);
+            if (data?.email) {
+                setError(
+                    Array.isArray(data.email) ? data.email[0] : data.email,
+                );
+            } else if (data?.phone_number) {
+                setError(
+                    Array.isArray(data.phone_number)
+                        ? data.phone_number[0]
+                        : data.phone_number,
+                );
+            } else if (data?.non_field_errors) {
+                setError(
+                    Array.isArray(data.non_field_errors)
+                        ? data.non_field_errors[0]
+                        : data.non_field_errors,
+                );
+            } else {
+                setError("Registration failed. Please try again.");
+            }
         } finally {
             setIsLoading(false);
         }

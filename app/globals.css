@@ -93,3 +93,40 @@ body::before {
   z-index: 9998;
   transform: translate(-50%, -50%);
 }
+
+/* react-phone-number-input overrides */
+.PhoneInput {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.PhoneInputInput {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 13px;
+    width: 100%;
+}
+
+.PhoneInputCountrySelect {
+    background: var(--ink);
+    border: none;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+}
+
+.PhoneInputCountryIcon {
+    width: 20px;
+    height: 14px;
+}
+
+.PhoneInputCountrySelectArrow {
+    color: var(--gold-accent);
+    margin-left: 4px;
+}
