@@ -2,10 +2,11 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "@/lib/axios";
 import Dropdown from "@/components/common/Dropdown";
 import TagInput from "@/components/common/TagInput";
+import MultiDropdownTagInput from "@/components/common/MultiDropdownTagInput";
 import Toggle from "@/components/common/Toggle";
 
 const inputStyle = {
@@ -27,6 +28,25 @@ const labelStyle = {
     textTransform: "uppercase" as const,
     color: "var(--cream-muted)",
 };
+
+interface Option {
+    value: string;
+    label: string;
+}
+
+interface ActorChoices {
+    union_status: Option[];
+    languages: Option[];
+    singing_voice: Option[];
+    eye_color: Option[];
+    hair_color: Option[];
+    hair_length: Option[];
+    body_type: Option[];
+    ethnicity: Option[];
+    skin_tone: Option[];
+    facial_hair: Option[];
+    nudity_comfort: Option[];
+}
 
 interface ActorData {
     union_status: string;
@@ -53,7 +73,7 @@ interface ActorData {
     instrument_skills: string[];
     combat_styles: string[];
     sport_skills: string[];
-    singing_voice_type: string;
+    singing_voice_type: string[];
     stunt_certified: boolean;
     has_vehicle: boolean;
     can_drive_manual: boolean;
@@ -141,6 +161,26 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
+    const [choices, setChoices] = useState<ActorChoices>({
+        union_status: [],
+        languages: [],
+        singing_voice: [],
+        eye_color: [],
+        hair_color: [],
+        hair_length: [],
+        body_type: [],
+        ethnicity: [],
+        skin_tone: [],
+        facial_hair: [],
+        nudity_comfort: [],
+    });
+
+    useEffect(() => {
+        api.get("/api/v1/profile/actor/choices/")
+            .then((res) => setChoices(res.data))
+            .catch(() => {});
+    }, []);
+
     const [form, setForm] = useState<ActorData>({
         union_status: "",
         age_range_min: "",
@@ -166,7 +206,7 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
         instrument_skills: [],
         combat_styles: [],
         sport_skills: [],
-        singing_voice_type: "",
+        singing_voice_type: [],
         stunt_certified: false,
         has_vehicle: false,
         can_drive_manual: false,
@@ -270,15 +310,11 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
             >
                 {/*  Core  */}
                 <Dropdown
-                    options={[
-                        { label: "SAG-AFTRA", value: "sag_aftra" },
-                        { label: "IATSE", value: "iatse" },
-                        { label: "Non-Union", value: "non_union" },
-                        { label: "Fi-Core", value: "fi_core" },
-                    ]}
+                    options={choices.union_status}
                     value={form.union_status}
                     onChange={(v) => set("union_status", String(v))}
                     placeholder="Union Status"
+                    optional
                 />
 
                 <div style={{ display: "flex", gap: "16px" }}>
@@ -320,8 +356,9 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     </div>
                 </div>
 
-                <TagInput
+                <MultiDropdownTagInput
                     label="Languages"
+                    options={choices.languages}
                     value={form.languages}
                     onChange={(v) => set("languages", v)}
                 />
@@ -401,161 +438,53 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     </div>
 
                     <Dropdown
-                        options={[
-                            { label: "Brown", value: "brown" },
-                            { label: "Blue", value: "blue" },
-                            { label: "Hazel", value: "hazel" },
-                            { label: "Amber", value: "amber" },
-                            { label: "Gray", value: "gray" },
-                            { label: "Green", value: "green" },
-                            { label: "Violet", value: "violet" },
-                            { label: "Red", value: "red" },
-                            { label: "Black", value: "black" },
-                        ]}
+                        options={choices.eye_color}
                         value={form.eye_color}
                         onChange={(v) => set("eye_color", String(v))}
                         placeholder="Eye Color"
+                        optional
                     />
                     <Dropdown
-                        options={[
-                            { label: "Black", value: "black" },
-                            { label: "Dark Brown", value: "dark_brown" },
-                            { label: "Brown", value: "brown" },
-                            { label: "Light Brown", value: "light_brown" },
-                            { label: "Dirty Blonde", value: "dirty_blonde" },
-                            { label: "Blonde", value: "blonde" },
-                            {
-                                label: "Platinum Blonde",
-                                value: "platinum_blonde",
-                            },
-                            {
-                                label: "Strawberry Blonde",
-                                value: "strawberry_blonde",
-                            },
-                            { label: "Auburn", value: "auburn" },
-                            { label: "Red", value: "red" },
-                            { label: "Gray", value: "gray" },
-                            { label: "White", value: "white" },
-                            {
-                                label: "Salt and Pepper",
-                                value: "salt_and_pepper",
-                            },
-                            { label: "Other", value: "other" },
-                        ]}
+                        options={choices.hair_color}
                         value={form.hair_color}
                         onChange={(v) => set("hair_color", String(v))}
                         placeholder="Hair Color"
+                        optional
                     />
                     <Dropdown
-                        options={[
-                            { label: "Bald", value: "bald" },
-                            { label: "Buzzed", value: "buzzed" },
-                            { label: "Short", value: "short" },
-                            { label: "Ear Length", value: "ear_length" },
-                            { label: "Chin Length", value: "chin_length" },
-                            {
-                                label: "Shoulder Length",
-                                value: "shoulder_length",
-                            },
-                            { label: "Armpit Length", value: "armpit_length" },
-                            {
-                                label: "Mid-Back Length",
-                                value: "mid_back_length",
-                            },
-                            { label: "Waist Length", value: "waist_length" },
-                            { label: "Hip Length", value: "hip_length" },
-                            {
-                                label: "Tailbone Length",
-                                value: "tailbone_length",
-                            },
-                            { label: "Floor Length", value: "floor_length" },
-                        ]}
+                        options={choices.hair_length}
                         value={form.hair_length}
                         onChange={(v) => set("hair_length", String(v))}
                         placeholder="Hair Length"
+                        optional
                     />
                     <Dropdown
-                        options={[
-                            { label: "Thin", value: "thin" },
-                            { label: "Slim", value: "slim" },
-                            { label: "Slender", value: "slender" },
-                            { label: "Average", value: "average" },
-                            { label: "Athletic", value: "athletic" },
-                            { label: "Toned", value: "toned" },
-                            { label: "Muscular", value: "muscular" },
-                            { label: "Stocky", value: "stocky" },
-                            { label: "Curvy", value: "curvy" },
-                            { label: "Plus Size", value: "plus_size" },
-                            { label: "Large", value: "large" },
-                            { label: "Heavyset", value: "heavyset" },
-                        ]}
+                        options={choices.body_type}
                         value={form.body_type}
                         onChange={(v) => set("body_type", String(v))}
                         placeholder="Body Type"
+                        optional
                     />
                     <Dropdown
-                        options={[
-                            {
-                                label: "American Indian or Alaska Native",
-                                value: "american_indian_alaska_native",
-                            },
-                            { label: "Asian", value: "asian" },
-                            {
-                                label: "Black or African American",
-                                value: "black_african_american",
-                            },
-                            {
-                                label: "Hispanic or Latino",
-                                value: "hispanic_latino",
-                            },
-                            {
-                                label: "Middle Eastern or North African",
-                                value: "middle_eastern_north_african",
-                            },
-                            {
-                                label: "Native Hawaiian or Pacific Islander",
-                                value: "native_hawaiian_pacific_islander",
-                            },
-                            { label: "White", value: "white" },
-                            { label: "Other", value: "other" },
-                            {
-                                label: "Prefer not to say",
-                                value: "prefer_not_to_say",
-                            },
-                        ]}
+                        options={choices.ethnicity}
                         value={form.ethnicity}
                         onChange={(v) => set("ethnicity", String(v))}
                         placeholder="Ethnicity"
+                        optional
                     />
                     <Dropdown
-                        options={[
-                            { label: "Porcelain", value: "porcelain" },
-                            { label: "Fair", value: "fair" },
-                            { label: "Light", value: "light" },
-                            { label: "Medium", value: "medium" },
-                            { label: "Tan", value: "tan" },
-                            { label: "Olive", value: "olive" },
-                            { label: "Brown", value: "brown" },
-                            { label: "Dark", value: "dark" },
-                            { label: "Deep", value: "deep" },
-                            { label: "Ebony", value: "ebony" },
-                        ]}
+                        options={choices.skin_tone}
                         value={form.skin_tone}
                         onChange={(v) => set("skin_tone", String(v))}
                         placeholder="Skin Tone"
+                        optional
                     />
                     <Dropdown
-                        options={[
-                            { label: "None", value: "none" },
-                            { label: "Stubble", value: "stubble" },
-                            { label: "Moustache", value: "moustache" },
-                            { label: "Goatee", value: "goatee" },
-                            { label: "Beard", value: "beard" },
-                            { label: "Full Beard", value: "full_beard" },
-                        ]}
+                        options={choices.facial_hair}
                         value={form.facial_hair}
                         onChange={(v) => set("facial_hair", String(v))}
                         placeholder="Facial Hair"
+                        optional
                     />
 
                     <Toggle
@@ -592,19 +521,11 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                         value={form.sport_skills}
                         onChange={(v) => set("sport_skills", v)}
                     />
-                    <Dropdown
-                        options={[
-                            { label: "Soprano", value: "soprano" },
-                            { label: "Mezzo-Soprano", value: "mezzo_soprano" },
-                            { label: "Contralto", value: "contralto" },
-                            { label: "Tenor", value: "tenor" },
-                            { label: "Baritone", value: "baritone" },
-                            { label: "Bass", value: "bass" },
-                            { label: "Countertenor", value: "countertenor" },
-                        ]}
+                    <MultiDropdownTagInput
+                        label="Singing Voice Type"
+                        options={choices.singing_voice}
                         value={form.singing_voice_type}
-                        onChange={(v) => set("singing_voice_type", String(v))}
-                        placeholder="Singing Voice Type"
+                        onChange={(v) => set("singing_voice_type", v)}
                     />
                     <Toggle
                         label="Stunt Certified"
