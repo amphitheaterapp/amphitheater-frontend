@@ -33,6 +33,13 @@ interface Props {
 export default function TagInput({ label, value, onChange }: Props) {
     const [input, setInput] = useState("");
 
+    //hover and active states for the add button
+    const [addHovered, setAddHovered] = useState(false);
+    const [addActive, setAddActive] = useState(false);
+
+    // tracks which tag's × is currently hovered using the value
+    const [hoveredTag, setHoveredTag] = useState<string | null>(null);
+
     const add = () => {
         const trimmed = input.trim();
         if (trimmed && !value.includes(trimmed)) {
@@ -62,14 +69,32 @@ export default function TagInput({ label, value, onChange }: Props) {
                 <button
                     type="button"
                     onClick={add}
+                    onMouseEnter={() => setAddHovered(true)}
+                    onMouseLeave={() => {
+                        setAddHovered(false);
+                        setAddActive(false);
+                    }}
+                    onMouseDown={() => setAddActive(true)}
+                    onMouseUp={() => setAddActive(false)}
                     style={{
-                        background: "transparent",
-                        border: "1px solid rgba(212,185,106,0.3)",
-                        color: "var(--gold-accent)",
+                        // background: "transparent",
+                        // border: "1px solid rgba(212,185,106,0.3)",
+                        // color: "var(--gold-accent)",
+                        background: addHovered
+                            ? "rgba(212,185,106,0.08)"
+                            : "transparent",
+                        border: addHovered
+                            ? "1px solid rgba(212,185,106,0.7)"
+                            : "1px solid rgba(212,185,106,0.3)",
+                        color: addHovered
+                            ? "var(--gold-accent)"
+                            : "rgba(212,185,106,0.6)",
                         fontFamily: "var(--font-body)",
                         fontSize: "11px",
                         padding: "4px 12px",
                         cursor: "pointer",
+                        transform: addActive ? "scale(0.95)" : "scale(1)",
+                        transition: "background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease",
                     }}
                 >
                     add
@@ -96,13 +121,21 @@ export default function TagInput({ label, value, onChange }: Props) {
                             <button
                                 type="button"
                                 onClick={() => remove(item)}
+                                onMouseEnter={() => setHoveredTag(item)}
+                                onMouseLeave={() => setHoveredTag(null)}
                                 style={{
                                     background: "transparent",
                                     border: "none",
-                                    color: "var(--cream-muted)",
+                                    color: hoveredTag === item
+                                        ? "#e57373"
+                                        : "var(--cream-muted)",
                                     cursor: "pointer",
                                     padding: 0,
                                     fontSize: "12px",
+                                    transform: hoveredTag === item
+                                        ? "scale(1.2)"
+                                        : "scale(1)",
+                                    transition: "color 0.15s ease, transform 0.15s ease",
                                 }}
                             >
                                 ×
