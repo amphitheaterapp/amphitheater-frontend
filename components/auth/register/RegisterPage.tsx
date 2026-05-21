@@ -5,10 +5,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+
 import LoginConstellation from "../LoginConstellation";
 import AnimatedLogo from "../AnimatedLogo";
+
 import BasicDetailsForm from "./BasicDetailsForm";
 import RoleSelectForm from "./RoleSelectForm";
+
+import DirectorDetailsForm from "./DirectorDetailsForm";
 import ActorDetailsForm from "./ActorDetailsForm";
 
 export type BasicDetails = {
@@ -224,6 +228,12 @@ export default function RegisterPage() {
                     )}
 
                     {/* TODO: add other role forms here as they are built */}
+                    {step === "profile" && selectedRole === "director" && (
+                        <DirectorDetailsForm
+                            onComplete={handleProfileComplete}
+                            onSkip={handleSkip}
+                        />
+                    )}
                 </div>
             </div>
         </main>

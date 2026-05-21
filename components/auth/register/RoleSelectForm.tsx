@@ -24,7 +24,7 @@ const ROLES: {
         label: "Director",
         description:
             "Film, TV, commercial, theatre, and documentary direction.",
-        available: false,
+        available: true,
     },
     {
         id: "producer",
