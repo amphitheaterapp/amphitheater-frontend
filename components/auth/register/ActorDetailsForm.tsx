@@ -123,7 +123,7 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
         special_skills: [],
         willing_to_travel: false,
         has_valid_passport: false,
-        nudity_comfort: "none",
+        nudity_comfort: "",
         height_cm: "",
         weight_kg: "",
         eye_color: "",
@@ -171,8 +171,30 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                 profile_links: {},
             });
             onComplete();
-        } catch {
-            setError("Failed to save profile. Please try again.");
+        } catch (err: any) {
+            const data = err?.response?.data;
+            if (data) {
+                // Find the first field error and show it
+                const firstKey = Object.keys(data).find((k) => k !== "message");
+                if (firstKey) {
+                    const fieldError = data[firstKey];
+                    // Handle both array errors (["msg"]) and indexed errors ({"0": ["msg"]})
+                    if (Array.isArray(fieldError)) {
+                        setError(`${firstKey}: ${fieldError[0]}`);
+                    } else if (typeof fieldError === "object") {
+                        const firstIndexError = Object.values(
+                            fieldError,
+                        )[0] as string[];
+                        setError(`${firstKey}: ${firstIndexError[0]}`);
+                    } else {
+                        setError(String(fieldError));
+                    }
+                } else {
+                    setError("Failed to save profile. Please try again.");
+                }
+            } else {
+                setError("Failed to save profile. Please try again.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -318,12 +340,7 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                 />
 
                 <Dropdown
-                    options={[
-                        { label: "None", value: "none" },
-                        { label: "Implied", value: "implied" },
-                        { label: "Partial", value: "partial" },
-                        { label: "Full", value: "full" },
-                    ]}
+                    options={choices.nudity_comfort}
                     value={form.nudity_comfort}
                     onChange={(v) => set("nudity_comfort", String(v))}
                     placeholder="Nudity Comfort"
