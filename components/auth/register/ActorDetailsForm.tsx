@@ -4,9 +4,11 @@
 
 import { useState, useEffect } from "react";
 import api from "@/lib/axios";
+
+import MultiDropdownTagInput from "@/components/common/MultiDropdownTagInput";
+import Collapsible from "@/components/common/Collapsible";
 import Dropdown from "@/components/common/Dropdown";
 import TagInput from "@/components/common/TagInput";
-import MultiDropdownTagInput from "@/components/common/MultiDropdownTagInput";
 import Toggle from "@/components/common/Toggle";
 
 const inputStyle = {
@@ -81,75 +83,6 @@ interface ActorData {
     imdb_url: string;
     representation: string;
     past_works: string[];
-}
-
-interface CollapsibleProps {
-    title: string;
-    children: React.ReactNode;
-}
-
-function Collapsible({ title, children }: CollapsibleProps) {
-    const [open, setOpen] = useState(false);
-
-    return (
-        <div
-            style={{
-                borderTop: "1px solid rgba(212,185,106,0.15)",
-                paddingTop: "20px",
-            }}
-        >
-            <button
-                type="button"
-                onClick={() => setOpen((prev) => !prev)}
-                style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    padding: 0,
-                }}
-            >
-                <span
-                    style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "10px",
-                        letterSpacing: "0.3em",
-                        textTransform: "uppercase",
-                        color: "var(--gold-accent)",
-                    }}
-                >
-                    {title}
-                </span>
-                <span
-                    style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "16px",
-                        color: "var(--gold-accent)",
-                        transition: "transform 0.2s ease",
-                        transform: open ? "rotate(45deg)" : "rotate(0deg)",
-                    }}
-                >
-                    +
-                </span>
-            </button>
-
-            {open && (
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "24px",
-                        marginTop: "24px",
-                    }}
-                >
-                    {children}
-                </div>
-            )}
-        </div>
-    );
 }
 
 interface Props {
