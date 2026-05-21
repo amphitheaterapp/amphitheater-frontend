@@ -260,6 +260,29 @@ export default function LoginPage() {
                             register
                         </Link>
                     </p>
+
+                    <p
+                        style={{
+                            fontFamily: "var(--font-body)",
+                            fontSize: "11px",
+                            color: "var(--cream-muted)",
+                            marginTop: "8px",
+                            textAlign: "center",
+                            letterSpacing: "0.05em",
+                        }}
+                    >
+                        forgot password?{" "}
+                        <Link
+                            href="/forgot-password"
+                            style={{
+                                color: "var(--gold-accent)",
+                                textDecoration: "none",
+                                letterSpacing: "0.1em",
+                            }}
+                        >
+                            click here
+                        </Link>
+                    </p>
                 </div>
             </div>
         </main>
