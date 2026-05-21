@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Base background, darkest layer */
+  --ink: #090b36;
+  /* Primary text and interactive highlights */
+  --gold: #f2ebc4;
+
+  /* Slightly lighter background for cards and raised surfaces */
+  --ink-mid: #0e1045;
+  /* Even lighter for elevated UI elements */
+  --ink-raised: #161a5c;
+  /* Section dividers and subtle borders */
+  --navy: #1c2070;
+  /* Hover states on navy elements */
+  --navy-mid: #232880;
+
+  /* Primary text color */
+  --cream: #f2ebc4;
+  /* Secondary text, subheadings */
+  --cream-dim: #c9c09a;
+  /* Placeholder text, disabled states, captions */
+  --cream-muted: #7a7260;
+
+  /* Buttons, borders, active accents */
+  --gold-accent: #d4b96a;
+  /* Muted gold for scrollbar and decorative details */
+  --gold-dim: #8a6e3e;
+
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-body: var(--font-mono), "Courier New", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ink);
+}
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  mix-blend-mode: overlay;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+
+.cursor-glow {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 169, 110, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+}
+
+/* react-phone-number-input overrides */
+.PhoneInput {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.PhoneInputInput {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 13px;
+    width: 100%;
+}
+
+.PhoneInputCountrySelect {
+    background: var(--ink);
+    border: none;
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+}
+
+.PhoneInputCountryIcon {
+    width: 20px;
+    height: 14px;
+}
+
+.PhoneInputCountrySelectArrow {
+    color: var(--gold-accent);
+    margin-left: 4px;
+}
