@@ -163,6 +163,7 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
                         onChange={handleChange}
                         required
                         style={inputStyle}
+                        autoComplete="off"
                     />
                 </div>
 
@@ -181,6 +182,7 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
                         onChange={handleChange}
                         required
                         style={inputStyle}
+                        autoComplete="off"
                     />
                 </div>
 
