@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { ColumnIcon } from "@/assets/InternalSVGPack";
 import { useAuth } from "@/context/AuthContext";
 
@@ -14,10 +14,19 @@ const linkStyle: CSSProperties = {
 };
 
 export default function Nav() {
+    const [scrolled, setScrolled] = useState(false);
     const { user, logout } = useAuth();
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 24);
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
 
     return (
         <nav
+            aria-label="Primary"
             style={{
                 position: "fixed",
                 top: 0,
@@ -28,10 +37,28 @@ export default function Nav() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 padding: "20px 32px",
-                borderBottom: "1px solid transparent",
+                background: scrolled
+                    ? "color-mix(in srgb, var(--ink) 80%, transparent)"
+                    : "transparent",
+                backdropFilter: scrolled ? "blur(12px)" : "none",
+                WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
+                borderBottom: scrolled
+                    ? "1px solid rgba(200,169,110,0.12)"
+                    : "1px solid transparent",
+                transition:
+                    "background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease",
             }}
         >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <a
+                href="#top"
+                aria-label="Amphitheater — back to top"
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    textDecoration: "none",
+                }}
+            >
                 <ColumnIcon
                     style={{
                         width: "36px",
@@ -50,13 +77,21 @@ export default function Nav() {
                 >
                     Amphitheater
                 </span>
-            </div>
+            </a>
 
             <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
-                <a href="#how-it-works" style={linkStyle}>
+                <a
+                    href="#how-it-works"
+                    className="amphi-nav-link amphi-nav-secondary"
+                    style={linkStyle}
+                >
                     How it works
                 </a>
-                <a href="#verification" style={linkStyle}>
+                <a
+                    href="#verification"
+                    className="amphi-nav-link amphi-nav-secondary"
+                    style={linkStyle}
+                >
                     Verification
                 </a>
                 {user ? (
