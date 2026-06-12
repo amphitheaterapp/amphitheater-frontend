@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Mission() {
+    const sectionRef = useRef<HTMLElement>(null);
     const labelRef = useRef<HTMLParagraphElement>(null);
     const headRef = useRef<HTMLHeadingElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
@@ -14,38 +15,40 @@ export default function Mission() {
     const closerRef = useRef<HTMLParagraphElement>(null);
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            gsap.fromTo(
-                labelRef.current,
-                { opacity: 0, y: 20 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.8,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: labelRef.current,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse",
-                    },
-                },
-            );
+        const fadeTargets = [
+            { ref: labelRef, y: 20, duration: 0.8 },
+            { ref: headRef, y: 40, duration: 1 },
+            { ref: bodyRef, y: 30, duration: 0.9 },
+            { ref: closerRef, y: 30, duration: 1 },
+        ];
 
-            gsap.fromTo(
-                headRef.current,
-                { opacity: 0, y: 40 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 1,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: headRef.current,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse",
-                    },
-                },
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            gsap.set(
+                fadeTargets.map((t) => t.ref.current),
+                { opacity: 1, y: 0 },
             );
+            gsap.set(lineRef.current, { scaleX: 1 });
+            return;
+        }
+
+        const ctx = gsap.context(() => {
+            fadeTargets.forEach(({ ref, y, duration }) => {
+                gsap.fromTo(
+                    ref.current,
+                    { opacity: 0, y },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: ref.current,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse",
+                        },
+                    },
+                );
+            });
 
             gsap.fromTo(
                 lineRef.current,
@@ -61,45 +64,14 @@ export default function Mission() {
                     },
                 },
             );
-
-            gsap.fromTo(
-                bodyRef.current,
-                { opacity: 0, y: 30 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.9,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: bodyRef.current,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse",
-                    },
-                },
-            );
-
-            gsap.fromTo(
-                closerRef.current,
-                { opacity: 0, y: 30 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 1,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: closerRef.current,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse",
-                    },
-                },
-            );
-        });
+        }, sectionRef);
 
         return () => ctx.revert();
     }, []);
 
     return (
         <section
+            ref={sectionRef}
             style={{
                 padding: "160px 32px",
                 maxWidth: "900px",
@@ -139,13 +111,14 @@ export default function Mission() {
                 vision to life.
                 <br />
                 <br />
-                <em style={{ color: "var(--cream-dim)", fontStyle: "italic" }}>
+                <em style={{ color: "var(--cream-dim)" }}>
                     Your people are here.
                 </em>
             </h2>
 
             <div
                 ref={lineRef}
+                aria-hidden="true"
                 style={{
                     width: "100%",
                     height: "1px",
