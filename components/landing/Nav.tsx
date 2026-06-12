@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { ColumnIcon } from "@/assets/InternalSVGPack";
+import { useAuth } from "@/context/AuthContext";
 
 const linkStyle: CSSProperties = {
     fontFamily: "var(--font-body)",
@@ -13,6 +14,8 @@ const linkStyle: CSSProperties = {
 };
 
 export default function Nav() {
+    const { user, logout } = useAuth();
+
     return (
         <nav
             style={{
@@ -56,21 +59,40 @@ export default function Nav() {
                 <a href="#verification" style={linkStyle}>
                     Verification
                 </a>
-                <button
-                    style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "11px",
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                        color: "var(--gold)",
-                        border: "1px solid var(--gold)",
-                        background: "transparent",
-                        padding: "8px 20px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Request Access
-                </button>
+                {user ? (
+                    <button
+                        onClick={logout}
+                        style={{
+                            fontFamily: "var(--font-body)",
+                            fontSize: "11px",
+                            letterSpacing: "0.2em",
+                            textTransform: "uppercase",
+                            color: "var(--gold)",
+                            border: "1px solid var(--gold)",
+                            background: "transparent",
+                            padding: "8px 20px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Log out
+                    </button>
+                ) : (
+                    <button
+                        style={{
+                            fontFamily: "var(--font-body)",
+                            fontSize: "11px",
+                            letterSpacing: "0.2em",
+                            textTransform: "uppercase",
+                            color: "var(--gold)",
+                            border: "1px solid var(--gold)",
+                            background: "transparent",
+                            padding: "8px 20px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Request Access
+                    </button>
+                )}
             </div>
         </nav>
     );

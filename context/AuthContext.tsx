@@ -45,11 +45,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setMounted(true);
     }, []);
 
+    // pre-load the users session if exists.
+    useEffect(() => {
+        const restoreSession = async () => {
+            setIsLoading(true);
+            try {
+                const response = await api.get("/api/v1/profile/");
+                setUser({
+                    id: response.data.id,
+                    email: response.data.email,
+                    name: response.data.name,
+                });
+            } catch {
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        restoreSession();
+    }, []);
+
     const login = async (email: string, password: string) => {
         const response = await api.post("/api/v1/auth/login/", {
             email,
             password,
         });
+        console.log(response.data.user);
         setUser(response.data.user);
     };
 
