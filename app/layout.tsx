@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Cormorant_Garamond, DM_Mono } from "next/font/google";
 // @ts-ignore
 import "./globals.css";
@@ -34,6 +35,10 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${cormorant.variable} ${dmMono.variable}`}>
             <body>
+                <Script
+                    src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=places`}
+                    strategy="beforeInteractive"
+                />
                 <AuthProvider>{children}</AuthProvider>
             </body>
         </html>
