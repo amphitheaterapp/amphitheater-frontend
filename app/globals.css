@@ -130,3 +130,31 @@ body::before {
     color: var(--gold-accent);
     margin-left: 4px;
 }
+
+.pac-container {
+    background: rgba(9, 11, 54, 0.95);
+    border: 1px solid rgba(212, 185, 106, 0.3);
+    font-family: var(--font-body);
+}
+
+.pac-item {
+    color: var(--cream);
+    border-top: 1px solid rgba(212, 185, 106, 0.1);
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+    background: rgba(212, 185, 106, 0.1);
+}
+
+.pac-item-query {
+    color: var(--gold-accent);
+    font-size: 12px;
+}
+
+.pac-matched {
+    color: var(--gold);
+}

@@ -28,10 +28,13 @@ interface AuthContextType {
 interface RegisterData {
     email: string;
     password: string;
+    confirm_password: string;
     name: string;
     dob: string;
     phone_number: string;
-    location: string;
+    location_label: string;
+    latitude: number | null;
+    longitude: number | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);

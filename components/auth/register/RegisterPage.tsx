@@ -22,7 +22,9 @@ export type BasicDetails = {
     name: string;
     dob: string;
     phone_number: string;
-    location: string;
+    location_label: string;
+    latitude: number | null;
+    longitude: number | null;
 };
 
 export type Role =
