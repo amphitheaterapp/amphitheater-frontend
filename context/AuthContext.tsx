@@ -41,7 +41,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -73,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email,
             password,
         });
-        console.log(response.data.user);
         setUser(response.data.user);
     };
 
