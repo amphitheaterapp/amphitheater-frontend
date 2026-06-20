@@ -255,7 +255,7 @@ export default function Hero() {
                     fontFamily: "var(--font-display)",
                     fontSize: "clamp(52px, 9vw, 128px)",
                     fontWeight: 300,
-                    lineHeight: 0.95,
+                    lineHeight: 1,
                     letterSpacing: "-0.02em",
                     color: "var(--cream)",
                     marginBottom: "32px",

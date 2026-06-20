@@ -18,12 +18,12 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    // route to dashboard if user already logged in
+    // route to feed if user already logged in
     useEffect(() => {
         if (!isLoading && user) {
-            router.push("/dashboard");
+            router.push("/app/feed");
         }
-    }, [user, isLoading]);
+    }, [user, isLoading, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,7 +31,7 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             await login(email, password);
-            router.push("/dashboard");
+            router.push("/app/feed");
         } catch {
             setError("Invalid email or password.");
         } finally {

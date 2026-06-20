@@ -28,17 +28,20 @@ interface AuthContextType {
 interface RegisterData {
     email: string;
     password: string;
+    confirm_password: string;
     name: string;
     dob: string;
     phone_number: string;
-    location: string;
+    location_label: string;
+    latitude: number | null;
+    longitude: number | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -70,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email,
             password,
         });
-        console.log(response.data.user);
         setUser(response.data.user);
     };
 

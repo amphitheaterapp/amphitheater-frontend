@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BasicDetails } from "./RegisterPage";
 import DatePicker from "@/components/common/DatePicker";
 import PhoneInput from "@/components/common/PhoneInput";
@@ -41,7 +41,9 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
         name: "",
         dob: "",
         phone_number: "",
-        location: "",
+        location_label: "",
+        latitude: null,
+        longitude: null,
     });
 
     const [error, setError] = useState("");
@@ -53,6 +55,48 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
         setOtpError("");
         setError("");
     };
+
+    const autocompleteRef = useRef<any | null>(null);
+    const locationInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const initAutocomplete = () => {
+            if (!locationInputRef.current) return;
+            const g = (window as any).google;
+            if (!g?.maps?.places) return;
+
+            autocompleteRef.current = new g.maps.places.Autocomplete(
+                locationInputRef.current,
+                { types: ["(cities)"] },
+            );
+            autocompleteRef.current.addListener("place_changed", () => {
+                const place = autocompleteRef.current?.getPlace();
+                if (!place?.geometry?.location) return;
+                setForm((prev) => ({
+                    ...prev,
+                    location_label: place.formatted_address || place.name || "",
+                    latitude: place.geometry!.location!.lat(),
+                    longitude: place.geometry!.location!.lng(),
+                }));
+            });
+        };
+
+        // If already loaded, init immediately
+        if ((window as any).google?.maps?.places) {
+            initAutocomplete();
+            return;
+        }
+
+        // Otherwise wait for the script to finish loading
+        const interval = setInterval(() => {
+            if ((window as any).google?.maps?.places) {
+                initAutocomplete();
+                clearInterval(interval);
+            }
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -107,6 +151,10 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
         }
         if (form.password !== form.confirm_password) {
             setError("Passwords do not match.");
+            return;
+        }
+        if (form.latitude === null || form.longitude === null) {
+            setError("Please select a location from the dropdown.");
             return;
         }
         onSubmit(form);
@@ -416,14 +464,21 @@ export default function BasicDetailsForm({ onSubmit, isLoading }: Props) {
                     }}
                 >
                     <label style={labelStyle}>Location</label>
-                    <input
-                        type="text"
-                        name="location"
-                        value={form.location}
-                        onChange={handleChange}
-                        required
-                        style={inputStyle}
-                    />
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "8px",
+                        }}
+                    >
+                        <input
+                            ref={locationInputRef}
+                            type="text"
+                            placeholder="Start typing your city..."
+                            required
+                            style={inputStyle}
+                        />
+                    </div>
                 </div>
 
                 {/* Submit */}

@@ -22,7 +22,9 @@ export type BasicDetails = {
     name: string;
     dob: string;
     phone_number: string;
-    location: string;
+    location_label: string;
+    latitude: number | null;
+    longitude: number | null;
 };
 
 export type Role =
@@ -87,11 +89,11 @@ export default function RegisterPage() {
     };
 
     const handleProfileComplete = () => {
-        router.push("/dashboard");
+        router.push("/app/feed");
     };
 
     const handleSkip = () => {
-        router.push("/dashboard");
+        router.push("/app/feed");
     };
 
     return (
