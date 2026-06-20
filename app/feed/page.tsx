@@ -17,6 +17,7 @@ export default function DashboardPage() {
     const retriesRef = useRef(0);
     const loadedRef = useRef(false); // never re-fetch once loaded
 
+    // Redirect user if they are not logged in.
     useEffect(() => {
         if (!isLoading && !user) {
             router.push("/login");

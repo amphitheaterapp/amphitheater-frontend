@@ -89,11 +89,11 @@ export default function RegisterPage() {
     };
 
     const handleProfileComplete = () => {
-        router.push("/dashboard");
+        router.push("/feed");
     };
 
     const handleSkip = () => {
-        router.push("/dashboard");
+        router.push("/feed");
     };
 
     return (
