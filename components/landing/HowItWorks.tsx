@@ -53,8 +53,34 @@ export default function HowItWorks() {
     const lineRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            const section = sectionRef.current;
+            if (section) {
+                gsap.set(
+                    [
+                        labelRef.current,
+                        headRef.current,
+                        ...panelRefs.current,
+                        ...Array.from(section.querySelectorAll(".detail-item")),
+                    ],
+                    { opacity: 1, x: 0, y: 0 },
+                );
+                gsap.set(section.querySelectorAll(".panel-num"), {
+                    opacity: 0.2,
+                    scale: 1,
+                });
+                gsap.set(
+                    [
+                        lineRef.current,
+                        ...Array.from(section.querySelectorAll(".accent-line")),
+                    ],
+                    { scaleX: 1 },
+                );
+            }
+            return;
+        }
+
         const ctx = gsap.context(() => {
-            // Label + headline
             gsap.fromTo(
                 labelRef.current,
                 { opacity: 0, y: 20 },
@@ -102,13 +128,11 @@ export default function HowItWorks() {
                 },
             );
 
-            // Each panel
             panelRefs.current.forEach((panel, i) => {
                 if (!panel) return;
 
                 const isEven = i % 2 === 0;
 
-                // Panel slide in
                 gsap.fromTo(
                     panel,
                     { opacity: 0, x: isEven ? -50 : 50 },
@@ -125,10 +149,8 @@ export default function HowItWorks() {
                     },
                 );
 
-                // Detail items stagger
-                const items = panel.querySelectorAll(".detail-item");
                 gsap.fromTo(
-                    items,
+                    panel.querySelectorAll(".detail-item"),
                     { opacity: 0, x: -20 },
                     {
                         opacity: 1,
@@ -144,13 +166,11 @@ export default function HowItWorks() {
                     },
                 );
 
-                // Number counter
-                const numEl = panel.querySelector(".panel-num");
                 gsap.fromTo(
-                    numEl,
+                    panel.querySelector(".panel-num"),
                     { opacity: 0, scale: 0.8 },
                     {
-                        opacity: 1,
+                        opacity: 0.2,
                         scale: 1,
                         duration: 0.8,
                         ease: "back.out(1.4)",
@@ -162,10 +182,8 @@ export default function HowItWorks() {
                     },
                 );
 
-                // Accent line draw
-                const accentLine = panel.querySelector(".accent-line");
                 gsap.fromTo(
-                    accentLine,
+                    panel.querySelector(".accent-line"),
                     { scaleX: 0, transformOrigin: "left center" },
                     {
                         scaleX: 1,
@@ -204,13 +222,13 @@ export default function HowItWorks() {
                         fontFamily: "var(--font-body)",
                         fontSize: "11px",
                         letterSpacing: "0.4em",
-                        textTransform: "lowercase",
-                        color: "var(--gold-accent)",
-                        marginBottom: "24px",
+                        textTransform: "uppercase",
+                        color: "var(--gold)",
+                        marginBottom: "48px",
                         opacity: 0,
                     }}
                 >
-                    how it works
+                    How It Works
                 </p>
 
                 <h2
@@ -227,188 +245,199 @@ export default function HowItWorks() {
                     }}
                 >
                     built around projects,{" "}
-                    <em
-                        style={{
-                            color: "var(--cream-dim)",
-                            fontStyle: "italic",
-                        }}
-                    >
-                        not profiles.
-                    </em>
+                    <em style={{ color: "var(--cream-dim)" }}>not profiles.</em>
                 </h2>
 
                 <div
                     ref={lineRef}
+                    aria-hidden="true"
                     style={{
                         width: "100%",
                         height: "1px",
-                        background: "rgba(212,185,106,0.2)",
+                        background: "rgba(200,169,110,0.2)",
                         marginTop: "48px",
                     }}
                 />
             </div>
 
             {/* Feature panels */}
-            {features.map((f, i) => (
-                <div
-                    key={f.num}
-                    ref={(el) => {
-                        panelRefs.current[i] = el;
-                    }}
-                    style={{
-                        padding: "64px 32px",
-                        borderTop: "1px solid rgba(212,185,106,0.08)",
-                        background:
-                            i % 2 === 1 ? "var(--ink-mid)" : "transparent",
-                        opacity: 0,
-                    }}
-                >
+            {features.map((f, i) => {
+                const isEven = i % 2 === 0;
+                return (
                     <div
+                        key={f.num}
+                        ref={(el) => {
+                            panelRefs.current[i] = el;
+                        }}
                         style={{
-                            maxWidth: "1100px",
-                            margin: "0 auto",
-                            display: "grid",
-                            gridTemplateColumns: "1fr 1fr",
-                            gap: "80px",
-                            alignItems: "center",
-                            direction: i % 2 === 1 ? "rtl" : "ltr",
+                            padding: "64px 32px",
+                            borderTop: "1px solid rgba(200,169,110,0.08)",
+                            background: isEven
+                                ? "transparent"
+                                : "var(--ink-mid)",
+                            opacity: 0,
                         }}
                     >
-                        {/* Left — text */}
-                        <div style={{ direction: "ltr" }}>
+                        <div
+                            className="amphi-hiw-grid"
+                            style={{
+                                maxWidth: "1100px",
+                                margin: "0 auto",
+                                display: "grid",
+                                gridTemplateColumns: "1fr 1fr",
+                                gap: "80px",
+                                alignItems: "center",
+                            }}
+                        >
+                            {/* Text — alternates sides via grid order, not
+                                direction:rtl, so text selection and reading
+                                order stay sane */}
                             <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "16px",
-                                    marginBottom: "24px",
-                                }}
+                                className="amphi-hiw-text"
+                                style={{ order: isEven ? 1 : 2 }}
                             >
-                                <span
-                                    className="panel-num"
+                                <div
                                     style={{
-                                        fontFamily: "var(--font-display)",
-                                        fontSize: "72px",
-                                        fontWeight: 300,
-                                        color: "var(--gold-accent)",
-                                        opacity: 0.2,
-                                        lineHeight: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "16px",
+                                        marginBottom: "24px",
                                     }}
                                 >
-                                    {f.num}
-                                </span>
-                                <span
-                                    style={{
-                                        fontFamily: "var(--font-body)",
-                                        fontSize: "10px",
-                                        letterSpacing: "0.3em",
-                                        textTransform: "lowercase",
-                                        color: "var(--gold-accent)",
-                                    }}
-                                >
-                                    {f.tag}
-                                </span>
-                            </div>
-
-                            <div
-                                className="accent-line"
-                                style={{
-                                    width: "48px",
-                                    height: "1px",
-                                    background: "var(--gold-accent)",
-                                    marginBottom: "24px",
-                                }}
-                            />
-
-                            <h3
-                                style={{
-                                    fontFamily: "var(--font-display)",
-                                    fontSize: "clamp(28px, 3.5vw, 48px)",
-                                    fontWeight: 300,
-                                    lineHeight: 1.1,
-                                    color: "var(--cream)",
-                                    marginBottom: "24px",
-                                    whiteSpace: "pre-line",
-                                    textTransform: "lowercase",
-                                }}
-                            >
-                                {f.headline}
-                            </h3>
-
-                            <p
-                                style={{
-                                    fontFamily: "var(--font-body)",
-                                    fontSize: "13px",
-                                    color: "var(--cream-muted)",
-                                    lineHeight: 1.9,
-                                    marginBottom: "32px",
-                                    textTransform: "lowercase",
-                                }}
-                            >
-                                {f.body}
-                            </p>
-                        </div>
-
-                        {/* Right — detail list */}
-                        <div style={{ direction: "ltr" }}>
-                            <div
-                                style={{
-                                    padding: "40px",
-                                    border: "1px solid rgba(212,185,106,0.12)",
-                                    background: "var(--ink-raised)",
-                                }}
-                            >
-                                {f.details.map((d, di) => (
-                                    <div
-                                        key={di}
-                                        className="detail-item"
+                                    <span
+                                        className="panel-num"
+                                        aria-hidden="true"
                                         style={{
-                                            display: "flex",
-                                            alignItems: "flex-start",
-                                            gap: "16px",
-                                            paddingBottom:
-                                                di < f.details.length - 1
-                                                    ? "20px"
-                                                    : 0,
-                                            marginBottom:
-                                                di < f.details.length - 1
-                                                    ? "20px"
-                                                    : 0,
-                                            borderBottom:
-                                                di < f.details.length - 1
-                                                    ? "1px solid rgba(212,185,106,0.08)"
-                                                    : "none",
+                                            fontFamily: "var(--font-display)",
+                                            fontSize: "72px",
+                                            fontWeight: 300,
+                                            color: "var(--gold)",
                                             opacity: 0,
+                                            lineHeight: 1,
                                         }}
                                     >
-                                        <span
+                                        {f.num}
+                                    </span>
+                                    <span
+                                        style={{
+                                            fontFamily: "var(--font-body)",
+                                            fontSize: "10px",
+                                            letterSpacing: "0.3em",
+                                            textTransform: "lowercase",
+                                            color: "var(--gold)",
+                                        }}
+                                    >
+                                        {f.tag}
+                                    </span>
+                                </div>
+
+                                <div
+                                    className="accent-line"
+                                    aria-hidden="true"
+                                    style={{
+                                        width: "48px",
+                                        height: "1px",
+                                        background: "var(--gold)",
+                                        marginBottom: "24px",
+                                    }}
+                                />
+
+                                <h3
+                                    style={{
+                                        fontFamily: "var(--font-display)",
+                                        fontSize: "clamp(28px, 3.5vw, 48px)",
+                                        fontWeight: 300,
+                                        lineHeight: 1.1,
+                                        color: "var(--cream)",
+                                        marginBottom: "24px",
+                                        whiteSpace: "pre-line",
+                                        textTransform: "lowercase",
+                                    }}
+                                >
+                                    {f.headline}
+                                </h3>
+
+                                <p
+                                    style={{
+                                        fontFamily: "var(--font-body)",
+                                        fontSize: "13px",
+                                        color: "var(--cream-muted)",
+                                        lineHeight: 1.9,
+                                        textTransform: "lowercase",
+                                    }}
+                                >
+                                    {f.body}
+                                </p>
+                            </div>
+
+                            {/* Detail card */}
+                            <div
+                                className="amphi-hiw-card"
+                                style={{ order: isEven ? 2 : 1 }}
+                            >
+                                <ul
+                                    style={{
+                                        listStyle: "none",
+                                        margin: 0,
+                                        padding: "40px",
+                                        border: "1px solid rgba(200,169,110,0.12)",
+                                        background: "var(--ink-raised)",
+                                    }}
+                                >
+                                    {f.details.map((d, di) => (
+                                        <li
+                                            key={di}
+                                            className="detail-item"
                                             style={{
-                                                color: "var(--gold-accent)",
-                                                fontSize: "10px",
-                                                marginTop: "2px",
-                                                flexShrink: 0,
+                                                display: "flex",
+                                                alignItems: "flex-start",
+                                                gap: "16px",
+                                                paddingBottom:
+                                                    di < f.details.length - 1
+                                                        ? "20px"
+                                                        : 0,
+                                                marginBottom:
+                                                    di < f.details.length - 1
+                                                        ? "20px"
+                                                        : 0,
+                                                borderBottom:
+                                                    di < f.details.length - 1
+                                                        ? "1px solid rgba(200,169,110,0.08)"
+                                                        : "none",
+                                                opacity: 0,
                                             }}
                                         >
-                                            →
-                                        </span>
-                                        <span
-                                            style={{
-                                                fontFamily: "var(--font-body)",
-                                                fontSize: "12px",
-                                                color: "var(--cream-dim)",
-                                                lineHeight: 1.7,
-                                                textTransform: "lowercase",
-                                            }}
-                                        >
-                                            {d}
-                                        </span>
-                                    </div>
-                                ))}
+                                            <span
+                                                aria-hidden="true"
+                                                style={{
+                                                    color: "var(--gold)",
+                                                    fontSize: "10px",
+                                                    marginTop: "2px",
+                                                    flexShrink: 0,
+                                                }}
+                                            >
+                                                →
+                                            </span>
+                                            <span
+                                                style={{
+                                                    fontFamily:
+                                                        "var(--font-body)",
+                                                    fontSize: "12px",
+                                                    color: "var(--cream-dim)",
+                                                    lineHeight: 1.7,
+                                                    textTransform: "lowercase",
+                                                }}
+                                            >
+                                                {d}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                );
+            })}
         </section>
     );
 }

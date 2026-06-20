@@ -215,6 +215,7 @@ const CONSTELLATIONS = [
         ],
     },
 ];
+
 interface BgStar {
     x: number;
     y: number;
@@ -253,21 +254,33 @@ export default function ConstellationBackground() {
     const cStars = useRef<CStar[][]>([]);
     const cEdges = useRef<CEdge[][]>([]);
     const rafRef = useRef<number>(0);
-    const timeRef = useRef<number>(0);
+    const sweepRafRef = useRef<number>(0);
 
     useEffect(() => {
         const canvas = canvasRef.current!;
         const ctx = canvas.getContext("2d")!;
+        const prefersReduced = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        // Logical (CSS pixel) viewport size — the canvas backing store is
+        // scaled by devicePixelRatio so stars render sharp on retina.
+        let vw = 0;
+        let vh = 0;
 
         // Setup ─
         const setup = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            vw = window.innerWidth;
+            vh = window.innerHeight;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = vw * dpr;
+            canvas.height = vh * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             // Background stars
             bgStars.current = Array.from({ length: NUM_BG_STARS }, () => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
+                x: Math.random() * vw,
+                y: Math.random() * vh,
                 radius: Math.random() * 1.2 + 0.3,
                 baseOpacity: Math.random() * 0.25 + 0.05,
                 opacity: 0,
@@ -280,8 +293,8 @@ export default function ConstellationBackground() {
             cEdges.current = [];
 
             CONSTELLATIONS.forEach((c) => {
-                const ox = c.ox * canvas.width;
-                const oy = c.oy * canvas.height;
+                const ox = c.ox * vw;
+                const oy = c.oy * vh;
 
                 const starMap: Record<string, { x: number; y: number }> = {};
                 const stars: CStar[] = c.stars.map((s) => {
@@ -316,19 +329,71 @@ export default function ConstellationBackground() {
         };
 
         setup();
-        window.addEventListener("resize", setup);
 
-        // Mouse ─
-        const onMouse = (e: MouseEvent) => {
+        // Reduced motion: render one calm, static frame. Constellations
+        // are shown fully drawn at low opacity; nothing twinkles or chases
+        // the cursor.
+        const drawStatic = () => {
+            ctx.clearRect(0, 0, vw, vh);
+            bgStars.current.forEach((s) => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(242,235,196,${s.baseOpacity})`;
+                ctx.fill();
+            });
+            cEdges.current.forEach((edges) => {
+                edges.forEach((e) => {
+                    ctx.beginPath();
+                    ctx.moveTo(e.x1, e.y1);
+                    ctx.lineTo(e.x2, e.y2);
+                    ctx.strokeStyle = "rgba(242,235,196,0.14)";
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                });
+            });
+            cStars.current.forEach((stars) => {
+                stars.forEach((s) => {
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(242,235,196,0.35)";
+                    ctx.fill();
+                });
+            });
+        };
+
+        // Debounced resize — the old handler re-randomised the whole field
+        // on every resize event, which made the sky visibly "reshuffle"
+        // while dragging a window edge.
+        let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+        const onResize = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                setup();
+                if (prefersReduced) drawStatic();
+            }, 150);
+        };
+        window.addEventListener("resize", onResize);
+
+        if (prefersReduced) {
+            drawStatic();
+            return () => {
+                clearTimeout(resizeTimer);
+                window.removeEventListener("resize", onResize);
+            };
+        }
+
+        // Pointer ─ pointermove covers mouse and touch-drag, so mobile
+        // users get the constellation reveal too.
+        const onPointer = (e: PointerEvent) => {
             mouseRef.current = { x: e.clientX, y: e.clientY };
         };
-        window.addEventListener("mousemove", onMouse);
+        window.addEventListener("pointermove", onPointer, { passive: true });
+        window.addEventListener("pointerdown", onPointer, { passive: true });
 
         // Draw loop ─
         const draw = (timestamp: number) => {
-            timeRef.current = timestamp * 0.001; // seconds
-            const t = timeRef.current;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const t = timestamp * 0.001; // seconds
+            ctx.clearRect(0, 0, vw, vh);
             const mouse = mouseRef.current;
 
             // Background stars — twinkle
@@ -349,8 +414,8 @@ export default function ConstellationBackground() {
                 const edges = cEdges.current[ci];
 
                 // Find center of this constellation
-                const cx = c.ox * canvas.width + 80;
-                const cy = c.oy * canvas.height + 65;
+                const cx = c.ox * vw + 80;
+                const cy = c.oy * vh + 65;
                 const dx = mouse.x - cx;
                 const dy = mouse.y - cy;
                 const dist = Math.sqrt(dx * dx + dy * dy);
@@ -421,40 +486,58 @@ export default function ConstellationBackground() {
             rafRef.current = requestAnimationFrame(draw);
         };
 
-        // Load sweep — fake mouse sweeps across to draw constellations in
+        // Load sweep — fake pointer sweeps across to draw constellations in
         let sweepX = 0;
-        const sweepY = window.innerHeight * 0.45;
-        const sweepSpeed = window.innerWidth / 120; // pixels per frame
-
         const sweep = () => {
-            if (sweepX < window.innerWidth + 200) {
-                sweepX += sweepSpeed;
+            const sweepY = vh * 0.45;
+            if (sweepX < vw + 200) {
+                sweepX += vw / 120; // pixels per frame
                 mouseRef.current = { x: sweepX, y: sweepY };
-                requestAnimationFrame(sweep);
+                sweepRafRef.current = requestAnimationFrame(sweep);
             } else {
-                // Fade out — move mouse off screen
-                setTimeout(() => {
+                // Fade out — move pointer off screen
+                fadeTimer = setTimeout(() => {
                     mouseRef.current = { x: -1000, y: -1000 };
                 }, 800);
             }
         };
 
-        setTimeout(sweep, 400);
+        let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+        const startTimer = setTimeout(sweep, 400);
         rafRef.current = requestAnimationFrame(draw);
+
+        // Don't burn the battery while the tab is hidden.
+        const onVisibility = () => {
+            if (document.hidden) {
+                cancelAnimationFrame(rafRef.current);
+            } else {
+                rafRef.current = requestAnimationFrame(draw);
+            }
+        };
+        document.addEventListener("visibilitychange", onVisibility);
 
         return () => {
             cancelAnimationFrame(rafRef.current);
-            window.removeEventListener("resize", setup);
-            window.removeEventListener("mousemove", onMouse);
+            cancelAnimationFrame(sweepRafRef.current);
+            clearTimeout(startTimer);
+            clearTimeout(fadeTimer);
+            clearTimeout(resizeTimer);
+            window.removeEventListener("resize", onResize);
+            window.removeEventListener("pointermove", onPointer);
+            window.removeEventListener("pointerdown", onPointer);
+            document.removeEventListener("visibilitychange", onVisibility);
         };
     }, []);
 
     return (
         <canvas
             ref={canvasRef}
+            aria-hidden="true"
             style={{
                 position: "fixed",
                 inset: 0,
+                width: "100vw",
+                height: "100vh",
                 zIndex: 0,
                 pointerEvents: "none",
             }}

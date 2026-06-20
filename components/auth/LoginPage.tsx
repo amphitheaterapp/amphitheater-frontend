@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -11,11 +11,19 @@ import AnimatedLogo from "./AnimatedLogo";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { user, login } = useAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    // route to dashboard if user already logged in
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.push("/dashboard");
+        }
+    }, [user, isLoading]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
