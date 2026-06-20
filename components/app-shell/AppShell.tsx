@@ -1,16 +1,16 @@
-// components/app-shell/AppShell.tsx
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { MessagingProvider } from "@/context/MessagingContext";
 import Navbar from "./Navbar";
+import BubbleDock from "@/components/messaging/BubbleDock";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
     const router = useRouter();
 
-    // Route the user to login if they try direct URL entry without login.
     useEffect(() => {
         if (!isLoading && !user) {
             router.push("/login");
@@ -43,9 +43,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <>
+        <MessagingProvider>
             <Navbar />
             <div style={{ paddingTop: "72px" }}>{children}</div>
-        </>
+            <BubbleDock />
+        </MessagingProvider>
     );
 }

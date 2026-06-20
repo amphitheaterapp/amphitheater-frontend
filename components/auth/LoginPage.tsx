@@ -21,7 +21,7 @@ export default function LoginPage() {
     // route to feed if user already logged in
     useEffect(() => {
         if (!isLoading && user) {
-            router.push("/feed");
+            router.push("/app/feed");
         }
     }, [user, isLoading, router]);
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             await login(email, password);
-            router.push("/feed");
+            router.push("/app/feed");
         } catch {
             setError("Invalid email or password.");
         } finally {
