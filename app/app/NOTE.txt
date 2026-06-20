@@ -1,0 +1,2 @@
+This is invisible to the routes.
+Anything inside app like feed / messages / etc will be exposed to the router.
