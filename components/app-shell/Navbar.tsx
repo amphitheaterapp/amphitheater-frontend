@@ -43,7 +43,7 @@ export default function Navbar() {
             }}
         >
             <Link
-                href="/app/feed"
+                href="/"
                 style={{
                     display: "flex",
                     alignItems: "center",
