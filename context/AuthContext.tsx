@@ -15,6 +15,7 @@ interface User {
     id: string;
     email: string;
     name: string;
+    avatar_url: string | null;
 }
 
 interface AuthContextType {
@@ -22,6 +23,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     register: (data: RegisterData) => Promise<void>;
     logout: () => Promise<void>;
+    updateAvatarUrl: (url: string | null) => void;
     isLoading: boolean;
 }
 
@@ -48,7 +50,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setMounted(true);
     }, []);
 
-    // pre-load the users session if exists.
     useEffect(() => {
         const restoreSession = async () => {
             setIsLoading(true);
@@ -58,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     id: response.data.id,
                     email: response.data.email,
                     name: response.data.name,
+                    avatar_url: response.data.avatar_url ?? null,
                 });
             } catch {
                 setUser(null);
@@ -78,7 +80,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = async (data: RegisterData) => {
         const response = await api.post("/api/v1/auth/register/", data);
-        setUser(response.data.user);
+        // RegisterView's response only ever has id, email, name,
+        // confirmed from the actual view code. null here isn't a
+        // guess, a brand new account genuinely has no avatar yet.
+        setUser({
+            ...response.data.user,
+            avatar_url: null,
+        });
     };
 
     const logout = async () => {
@@ -86,9 +94,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     };
 
+    // Patches avatar_url into existing user state without a refetch.
+    const updateAvatarUrl = (url: string | null) => {
+        setUser((prev) => (prev ? { ...prev, avatar_url: url } : prev));
+    };
+
     return (
         <AuthContext.Provider
-            value={{ user, login, register, logout, isLoading }}
+            value={{
+                user,
+                login,
+                register,
+                logout,
+                updateAvatarUrl,
+                isLoading,
+            }}
         >
             {mounted ? children : null}
         </AuthContext.Provider>

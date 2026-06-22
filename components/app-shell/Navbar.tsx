@@ -35,7 +35,7 @@ export default function Navbar() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "16px 32px",
+                padding: "20px 32px",
                 background: "color-mix(in srgb, var(--ink) 90%, transparent)",
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
@@ -43,7 +43,7 @@ export default function Navbar() {
             }}
         >
             <Link
-                href="/"
+                href=""
                 style={{
                     display: "flex",
                     alignItems: "center",
@@ -53,8 +53,8 @@ export default function Navbar() {
             >
                 <ColumnIcon
                     style={{
-                        width: "28px",
-                        height: "28px",
+                        width: "36px",
+                        height: "36px",
                         color: "var(--cream)",
                     }}
                 />
@@ -119,9 +119,22 @@ export default function Navbar() {
                         fontSize: "11px",
                         letterSpacing: "0.05em",
                         color: "var(--gold-accent)",
+                        overflow: "hidden",
                     }}
                 >
-                    {getInitials(user?.name)}
+                    {user?.avatar_url ? (
+                        <img
+                            src={user.avatar_url}
+                            alt={user.name}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                            }}
+                        />
+                    ) : (
+                        getInitials(user?.name)
+                    )}
                 </div>
 
                 <button
