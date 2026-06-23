@@ -33,56 +33,53 @@ interface Option {
     label: string;
 }
 
-interface DirectorChoices {
+interface CinematographerChoices {
     union_status: Option[];
     languages: Option[];
-    narrative_style: Option[];
-    shooting_style: Option[];
-    color_philosophy: Option[];
-    works_with_actors_approach: Option[];
     genre_choices: Option[];
     format_choices: Option[];
     camera_systems: Option[];
+    lens_experience: Option[];
     past_budget_max: Option[];
+    lighting_style: Option[];
+    shooting_style: Option[];
+    color_philosophy: Option[];
 }
 
-interface DirectorData {
-    // Common
+interface CinematographerData {
     union_status: string;
     languages: string[];
     willing_to_travel: boolean;
     remote_capable: boolean;
-    has_own_equipment: boolean;
-    // Style
-    narrative_style: string[];
-    shooting_style: string[];
-    color_philosophy: string[];
-    works_with_actors_approach: string[];
-    visual_references: string[];
-    // Genres & Formats
     genres: string[];
     formats: string[];
     camera_systems: string[];
-    // Experience
+    lens_experience: string[];
+    owns_camera: boolean;
+    owns_lighting: boolean;
+    owns_grip_equipment: boolean;
+    drone_licensed: boolean;
+    drone_systems: string[];
+    steadicam_certified: boolean;
+    underwater_certified: boolean;
+    lighting_style: string;
+    shooting_style: string;
+    color_philosophy: string;
+    festival_selections: string[];
+    awards: string[];
+    visual_references: string[];
     years_experience: string;
+    past_budget_max: string;
+    largest_crew_managed: string;
     has_feature_credits: boolean;
     has_tv_credits: boolean;
     has_theatre_credits: boolean;
     has_documentary_credits: boolean;
     has_commercial_credits: boolean;
     has_music_video_credits: boolean;
-    longest_project_runtime_mins: string;
-    largest_crew_managed: string;
-    past_budget_max: string;
-    // Production company
-    has_production_company: boolean;
-    production_company_name: string;
-    // Links
     reel_url: string;
     imdb_url: string;
     past_works: string[];
-    awards: string[];
-    festival_selections: string[];
     profile_links: {
         linkedin: string;
         instagram: string;
@@ -96,60 +93,63 @@ interface Props {
     onSkip: () => void;
 }
 
-export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
+export default function CinematographerDetailsForm({ onComplete, onSkip }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const [choices, setChoices] = useState<DirectorChoices>({
+    const [choices, setChoices] = useState<CinematographerChoices>({
         union_status: [],
         languages: [],
-        narrative_style: [],
-        shooting_style: [],
-        color_philosophy: [],
-        works_with_actors_approach: [],
         genre_choices: [],
         format_choices: [],
         camera_systems: [],
+        lens_experience: [],
         past_budget_max: [],
+        lighting_style: [],
+        shooting_style: [],
+        color_philosophy: [],
     });
 
     useEffect(() => {
-        api.get("/api/v1/profile/director/choices/")
+        api.get("/api/v1/profile/cinematographer/choices/")
             .then((res) => setChoices(res.data))
             .catch(() => {});
     }, []);
 
-    const [form, setForm] = useState<DirectorData>({
+    const [form, setForm] = useState<CinematographerData>({
         union_status: "",
         languages: [],
         willing_to_travel: false,
         remote_capable: false,
-        has_own_equipment: false,
-        narrative_style: [],
-        shooting_style: [],
-        color_philosophy: [],
-        works_with_actors_approach: [],
-        visual_references: [],
         genres: [],
         formats: [],
         camera_systems: [],
+        lens_experience: [],
+        owns_camera: false,
+        owns_lighting: false,
+        owns_grip_equipment: false,
+        drone_licensed: false,
+        drone_systems: [],
+        steadicam_certified: false,
+        underwater_certified: false,
+        lighting_style: "",
+        shooting_style: "",
+        color_philosophy: "",
+        festival_selections: [],
+        awards: [],
+        visual_references: [],
         years_experience: "",
+        past_budget_max: "",
+        largest_crew_managed: "",
         has_feature_credits: false,
         has_tv_credits: false,
         has_theatre_credits: false,
         has_documentary_credits: false,
         has_commercial_credits: false,
         has_music_video_credits: false,
-        longest_project_runtime_mins: "",
-        largest_crew_managed: "",
-        past_budget_max: "",
-        has_production_company: false,
-        production_company_name: "",
         reel_url: "",
         imdb_url: "",
         past_works: [],
-        awards: [],
-        festival_selections: [],
         profile_links: {
             linkedin: "",
             instagram: "",
@@ -158,7 +158,7 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
         },
     });
 
-    const set = (key: keyof DirectorData, value: any) => {
+    const set = (key: keyof CinematographerData, value: any) => {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
 
@@ -167,13 +167,10 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
         setError("");
         setIsLoading(true);
         try {
-            await api.post("/api/v1/profile/director/", {
+            await api.post("/api/v1/profile/cinematographer/", {
                 ...form,
                 years_experience: form.years_experience
                     ? parseInt(form.years_experience)
-                    : null,
-                longest_project_runtime_mins: form.longest_project_runtime_mins
-                    ? parseInt(form.longest_project_runtime_mins)
                     : null,
                 largest_crew_managed: form.largest_crew_managed
                     ? parseInt(form.largest_crew_managed)
@@ -186,17 +183,13 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
         } catch (err: any) {
             const data = err?.response?.data;
             if (data) {
-                // Find the first field error and show it
                 const firstKey = Object.keys(data).find((k) => k !== "message");
                 if (firstKey) {
                     const fieldError = data[firstKey];
-                    // Handle both array errors (["msg"]) and indexed errors ({"0": ["msg"]})
                     if (Array.isArray(fieldError)) {
                         setError(`${firstKey}: ${fieldError[0]}`);
                     } else if (typeof fieldError === "object") {
-                        const firstIndexError = Object.values(
-                            fieldError,
-                        )[0] as string[];
+                        const firstIndexError = Object.values(fieldError)[0] as string[];
                         setError(`${firstKey}: ${firstIndexError[0]}`);
                     } else {
                         setError(String(fieldError));
@@ -224,7 +217,7 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     marginBottom: "12px",
                 }}
             >
-                director profile
+                cinematographer profile
             </p>
 
             <h1
@@ -237,7 +230,7 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     lineHeight: 1.1,
                 }}
             >
-                Build your profile
+                Build your profile.
             </h1>
 
             <p
@@ -269,13 +262,9 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
 
             <form
                 onSubmit={handleSubmit}
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "28px",
-                }}
+                style={{ display: "flex", flexDirection: "column", gap: "28px" }}
             >
-                {/*Core*/}
+                {/* Core — always visible */}
                 <Dropdown
                     options={choices.union_status}
                     value={form.union_status}
@@ -283,14 +272,30 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     placeholder="Union Status"
                     optional
                 />
-
                 <MultiDropdownTagInput
                     label="Languages"
                     options={choices.languages}
                     value={form.languages}
                     onChange={(v) => set("languages", v)}
                 />
-
+                <MultiDropdownTagInput
+                    label="Genres"
+                    options={choices.genre_choices}
+                    value={form.genres}
+                    onChange={(v) => set("genres", v)}
+                />
+                <MultiDropdownTagInput
+                    label="Formats"
+                    options={choices.format_choices}
+                    value={form.formats}
+                    onChange={(v) => set("formats", v)}
+                />
+                <MultiDropdownTagInput
+                    label="Lens Experience"
+                    options={choices.lens_experience}
+                    value={form.lens_experience}
+                    onChange={(v) => set("lens_experience", v)}
+                />
                 <Toggle
                     label="Willing to Travel"
                     value={form.willing_to_travel}
@@ -301,133 +306,116 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     value={form.remote_capable}
                     onChange={(v) => set("remote_capable", v)}
                 />
-                <Toggle
-                    label="Has Own Equipment"
-                    value={form.has_own_equipment}
-                    onChange={(v) => set("has_own_equipment", v)}
-                />
 
-                {/*Style & Creative*/}
-                <Collapsible title="Style & Creative">
-                    <MultiDropdownTagInput
-                        label="Narrative Style"
-                        options={choices.narrative_style}
-                        value={form.narrative_style}
-                        onChange={(v) => set("narrative_style", v)}
+                {/* Style & Vision */}
+                <Collapsible title="Style & Vision">
+                    <Dropdown
+                        options={choices.lighting_style}
+                        value={form.lighting_style}
+                        onChange={(v) => set("lighting_style", String(v))}
+                        placeholder="Lighting Style"
+                        optional
                     />
-                    <MultiDropdownTagInput
-                        label="Shooting Style"
+                    <Dropdown
                         options={choices.shooting_style}
                         value={form.shooting_style}
-                        onChange={(v) => set("shooting_style", v)}
+                        onChange={(v) => set("shooting_style", String(v))}
+                        placeholder="Shooting Style"
+                        optional
                     />
-                    <MultiDropdownTagInput
-                        label="Color Philosophy"
+                    <Dropdown
                         options={choices.color_philosophy}
                         value={form.color_philosophy}
-                        onChange={(v) => set("color_philosophy", v)}
-                    />
-                    <MultiDropdownTagInput
-                        label="Works With Actors"
-                        options={choices.works_with_actors_approach}
-                        value={form.works_with_actors_approach}
-                        onChange={(v) => set("works_with_actors_approach", v)}
+                        onChange={(v) => set("color_philosophy", String(v))}
+                        placeholder="Color Philosophy"
+                        optional
                     />
                     <TagInput
                         label="Visual References"
                         value={form.visual_references}
                         onChange={(v) => set("visual_references", v)}
                     />
+                    <TagInput
+                        label="Awards"
+                        value={form.awards}
+                        onChange={(v) => set("awards", v)}
+                    />
+                    <TagInput
+                        label="Festival Selections"
+                        value={form.festival_selections}
+                        onChange={(v) => set("festival_selections", v)}
+                    />
                 </Collapsible>
 
-                {/*Genres, Formats & Camera*/}
-                <Collapsible title="Genres, Formats & Camera">
-                    <MultiDropdownTagInput
-                        label="Genres"
-                        options={choices.genre_choices}
-                        value={form.genres}
-                        onChange={(v) => set("genres", v)}
-                    />
-                    <MultiDropdownTagInput
-                        label="Formats"
-                        options={choices.format_choices}
-                        value={form.formats}
-                        onChange={(v) => set("formats", v)}
-                    />
+                {/* Equipment */}
+                <Collapsible title="Equipment">
                     <MultiDropdownTagInput
                         label="Camera Systems"
                         options={choices.camera_systems}
                         value={form.camera_systems}
                         onChange={(v) => set("camera_systems", v)}
                     />
+                    <Toggle
+                        label="Owns Camera"
+                        value={form.owns_camera}
+                        onChange={(v) => set("owns_camera", v)}
+                    />
+                    <Toggle
+                        label="Owns Lighting"
+                        value={form.owns_lighting}
+                        onChange={(v) => set("owns_lighting", v)}
+                    />
+                    <Toggle
+                        label="Owns Grip Equipment"
+                        value={form.owns_grip_equipment}
+                        onChange={(v) => set("owns_grip_equipment", v)}
+                    />
+                    <Toggle
+                        label="Steadicam Certified"
+                        value={form.steadicam_certified}
+                        onChange={(v) => set("steadicam_certified", v)}
+                    />
+                    <Toggle
+                        label="Underwater Certified"
+                        value={form.underwater_certified}
+                        onChange={(v) => set("underwater_certified", v)}
+                    />
+                    <Toggle
+                        label="Drone Licensed"
+                        value={form.drone_licensed}
+                        onChange={(v) => set("drone_licensed", v)}
+                    />
+                    {form.drone_licensed && (
+                        <TagInput
+                            label="Drone Systems"
+                            value={form.drone_systems}
+                            onChange={(v) => set("drone_systems", v)}
+                        />
+                    )}
                 </Collapsible>
 
-                {/*Experience*/}
+                {/* Experience */}
                 <Collapsible title="Experience">
-                    <div style={{ display: "flex", gap: "16px" }}>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                                flex: 1,
-                            }}
-                        >
+                    <div style={{ display: "flex", gap: "24px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
                             <label style={labelStyle}>Years Experience</label>
                             <input
                                 type="number"
                                 value={form.years_experience}
-                                onChange={(e) =>
-                                    set("years_experience", e.target.value)
-                                }
+                                onChange={(e) => set("years_experience", e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                                flex: 1,
-                            }}
-                        >
-                            <label style={labelStyle}>
-                                Largest Crew Managed
-                            </label>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+                            <label style={labelStyle}>Largest Crew Managed</label>
                             <input
                                 type="number"
                                 value={form.largest_crew_managed}
-                                onChange={(e) =>
-                                    set("largest_crew_managed", e.target.value)
-                                }
+                                onChange={(e) => set("largest_crew_managed", e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
                     </div>
-
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                        }}
-                    >
-                        <label style={labelStyle}>
-                            Longest Project Runtime (mins)
-                        </label>
-                        <input
-                            type="number"
-                            value={form.longest_project_runtime_mins}
-                            onChange={(e) =>
-                                set(
-                                    "longest_project_runtime_mins",
-                                    e.target.value,
-                                )
-                            }
-                            style={inputStyle}
-                        />
-                    </div>
-
                     <Dropdown
                         options={choices.past_budget_max}
                         value={form.past_budget_max}
@@ -435,7 +423,6 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                         placeholder="Past Budget Max"
                         optional
                     />
-
                     <Toggle
                         label="Feature Credits"
                         value={form.has_feature_credits}
@@ -468,77 +455,18 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     />
                 </Collapsible>
 
-                {/*Awards & Recognition*/}
-                <Collapsible title="Awards & Recognition">
-                    <TagInput
-                        label="Awards"
-                        value={form.awards}
-                        onChange={(v) => set("awards", v)}
-                    />
-                    <TagInput
-                        label="Festival Selections"
-                        value={form.festival_selections}
-                        onChange={(v) => set("festival_selections", v)}
-                    />
-                </Collapsible>
-
-                {/*Production Company*/}
-                <Collapsible title="Production Company">
-                    <Toggle
-                        label="Has Production Company"
-                        value={form.has_production_company}
-                        onChange={(v) => set("has_production_company", v)}
-                    />
-                    {form.has_production_company && (
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                            }}
-                        >
-                            <label style={labelStyle}>Company Name</label>
-                            <input
-                                type="text"
-                                value={form.production_company_name}
-                                onChange={(e) =>
-                                    set(
-                                        "production_company_name",
-                                        e.target.value,
-                                    )
-                                }
-                                style={inputStyle}
-                            />
-                        </div>
-                    )}
-                </Collapsible>
-
-                {/*Links*/}
+                {/* Links */}
                 <Collapsible title="Links & Credits">
                     {[
                         { label: "Reel URL", key: "reel_url", type: "url" },
                         { label: "IMDb URL", key: "imdb_url", type: "url" },
                     ].map(({ label, key, type }) => (
-                        <div
-                            key={key}
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                            }}
-                        >
+                        <div key={key} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label style={labelStyle}>{label}</label>
                             <input
                                 type={type}
-                                value={
-                                    form[key as keyof DirectorData] as string
-                                }
-                                onChange={(e) =>
-                                    set(
-                                        key as keyof DirectorData,
-                                        e.target.value,
-                                    )
-                                }
+                                value={form[key as keyof CinematographerData] as string}
+                                onChange={(e) => set(key as keyof CinematographerData, e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
@@ -571,15 +499,8 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     ))}
                 </Collapsible>
 
-                {/*Actions*/}
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "12px",
-                        marginTop: "8px",
-                    }}
-                >
+                {/* Actions */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "8px" }}>
                     <button
                         type="submit"
                         disabled={isLoading}
@@ -588,12 +509,8 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                             fontSize: "11px",
                             letterSpacing: "0.2em",
                             textTransform: "uppercase",
-                            background: isLoading
-                                ? "transparent"
-                                : "var(--gold-accent)",
-                            color: isLoading
-                                ? "var(--cream-muted)"
-                                : "var(--ink)",
+                            background: isLoading ? "transparent" : "var(--gold-accent)",
+                            color: isLoading ? "var(--cream-muted)" : "var(--ink)",
                             border: "1px solid var(--gold-accent)",
                             padding: "16px 32px",
                             cursor: isLoading ? "not-allowed" : "pointer",
