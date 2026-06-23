@@ -2,9 +2,10 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { uploadAvatar } from "@/lib/avatarUpload";
 
 import LoginConstellation from "../LoginConstellation";
 import AnimatedLogo from "../AnimatedLogo";
@@ -42,7 +43,7 @@ type Step = (typeof STEPS)[number];
 
 export default function RegisterPage() {
     const router = useRouter();
-    const { register } = useAuth();
+    const { register, updateAvatarUrl, user } = useAuth();
 
     const [step, setStep] = useState<Step>("details");
     const [basicDetails, setBasicDetails] = useState<BasicDetails | null>(null);
@@ -50,13 +51,33 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    // route to feed if user already logged in
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.push("/app/feed");
+        }
+    }, [user, isLoading, router]);
+
     const currentStepIndex = STEPS.indexOf(step);
 
-    const handleBasicDetails = async (data: BasicDetails) => {
+    const handleBasicDetails = async (
+        data: BasicDetails,
+        avatarFile: File | null,
+    ) => {
         setError("");
         setIsLoading(true);
         try {
             await register(data);
+
+            if (avatarFile) {
+                try {
+                    const avatarUrl = await uploadAvatar(avatarFile);
+                    updateAvatarUrl(avatarUrl);
+                } catch {
+                    // user can set an avatar later
+                }
+            }
+
             setBasicDetails(data);
             setStep("role");
         } catch (err: any) {
@@ -193,7 +214,7 @@ export default function RegisterPage() {
                 <div
                     style={{
                         width: "100%",
-                        maxWidth: "680px",
+                        maxWidth: "960px",
                         border: "1px solid rgba(212,185,106,0.3)",
                         padding: "48px 40px",
                         background: "rgba(9,11,54,0.6)",
