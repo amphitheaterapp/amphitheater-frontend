@@ -30,19 +30,19 @@ const ROLES: {
         id: "producer",
         label: "Producer",
         description: "Executive, line, field, and associate production.",
-        available: false,
+        available: true,
     },
     {
         id: "cinematographer",
         label: "Cinematographer",
         description: "Directors of photography, camera operators, and gaffers.",
-        available: false,
+        available: true,
     },
     {
         id: "screenwriter",
         label: "Screenwriter",
         description: "Feature, episodic, short, and documentary writing.",
-        available: false,
+        available: true,
     },
 ];
 

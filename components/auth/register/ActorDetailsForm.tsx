@@ -83,6 +83,12 @@ interface ActorData {
     imdb_url: string;
     representation: string;
     past_works: string[];
+    profile_links: {
+        linkedin: string;
+        instagram: string;
+        youtube: string;
+        website: string;
+    };
 }
 
 interface Props {
@@ -147,6 +153,12 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
         imdb_url: "",
         representation: "",
         past_works: [],
+        profile_links: {
+            linkedin: "",
+            instagram: "",
+            youtube: "",
+            website: "",
+        },
     });
 
     const set = (key: keyof ActorData, value: any) => {
@@ -168,7 +180,9 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                     : null,
                 height_cm: form.height_cm ? parseInt(form.height_cm) : null,
                 weight_kg: form.weight_kg ? parseInt(form.weight_kg) : null,
-                profile_links: {},
+                profile_links: Object.fromEntries(
+                    Object.entries(form.profile_links).filter(([_, v]) => v !== "")
+                ),
             });
             onComplete();
         } catch (err: any) {
@@ -529,6 +543,27 @@ export default function ActorDetailsForm({ onComplete, onSkip }: Props) {
                         value={form.past_works}
                         onChange={(v) => set("past_works", v)}
                     />
+                    {[
+                        { label: "LinkedIn", key: "linkedin" },
+                        { label: "Instagram", key: "instagram" },
+                        { label: "YouTube", key: "youtube" },
+                        { label: "Personal Website", key: "website" },
+                    ].map(({ label, key }) => (
+                        <div key={key} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <label style={labelStyle}>{label}</label>
+                            <input
+                                type="url"
+                                value={form.profile_links[key as keyof typeof form.profile_links]}
+                                onChange={(e) =>
+                                    set("profile_links", {
+                                        ...form.profile_links,
+                                        [key]: e.target.value,
+                                    })
+                                }
+                                style={inputStyle}
+                            />
+                        </div>
+                    ))}
                 </Collapsible>
 
                 {/*  Actions  */}

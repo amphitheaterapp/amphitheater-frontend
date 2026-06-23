@@ -33,56 +33,46 @@ interface Option {
     label: string;
 }
 
-interface DirectorChoices {
+interface ProducerChoices {
     union_status: Option[];
     languages: Option[];
-    narrative_style: Option[];
-    shooting_style: Option[];
-    color_philosophy: Option[];
-    works_with_actors_approach: Option[];
     genre_choices: Option[];
     format_choices: Option[];
-    camera_systems: Option[];
-    past_budget_max: Option[];
+    producer_type: Option[];
+    budget_tier: Option[];
+    funding_sources: Option[];
 }
 
-interface DirectorData {
-    // Common
+interface ProducerData {
     union_status: string;
     languages: string[];
+    producer_type: string;
+    budget_tier: string;
     willing_to_travel: boolean;
     remote_capable: boolean;
-    has_own_equipment: boolean;
-    // Style
-    narrative_style: string[];
-    shooting_style: string[];
-    color_philosophy: string[];
-    works_with_actors_approach: string[];
-    visual_references: string[];
-    // Genres & Formats
+    distribution_experience: boolean;
     genres: string[];
     formats: string[];
-    camera_systems: string[];
-    // Experience
+    funding_sources: string[];
+    territories: string[];
+    has_distribution_deals: boolean;
+    has_broadcast_relationships: boolean;
+    has_streaming_relationships: boolean;
+    has_completion_bond_experience: boolean;
+    has_co_production_experience: boolean;
     years_experience: string;
+    largest_budget_managed: string;
+    largest_crew_managed: string;
     has_feature_credits: boolean;
     has_tv_credits: boolean;
     has_theatre_credits: boolean;
     has_documentary_credits: boolean;
     has_commercial_credits: boolean;
-    has_music_video_credits: boolean;
-    longest_project_runtime_mins: string;
-    largest_crew_managed: string;
-    past_budget_max: string;
-    // Production company
     has_production_company: boolean;
     production_company_name: string;
-    // Links
     reel_url: string;
     imdb_url: string;
     past_works: string[];
-    awards: string[];
-    festival_selections: string[];
     profile_links: {
         linkedin: string;
         instagram: string;
@@ -96,60 +86,56 @@ interface Props {
     onSkip: () => void;
 }
 
-export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
+export default function ProducerDetailsForm({ onComplete, onSkip }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const [choices, setChoices] = useState<DirectorChoices>({
+    const [choices, setChoices] = useState<ProducerChoices>({
         union_status: [],
         languages: [],
-        narrative_style: [],
-        shooting_style: [],
-        color_philosophy: [],
-        works_with_actors_approach: [],
         genre_choices: [],
         format_choices: [],
-        camera_systems: [],
-        past_budget_max: [],
+        producer_type: [],
+        budget_tier: [],
+        funding_sources: [],
     });
 
     useEffect(() => {
-        api.get("/api/v1/profile/director/choices/")
+        api.get("/api/v1/profile/producer/choices/")
             .then((res) => setChoices(res.data))
             .catch(() => {});
     }, []);
 
-    const [form, setForm] = useState<DirectorData>({
+    const [form, setForm] = useState<ProducerData>({
         union_status: "",
         languages: [],
+        producer_type: "",
+        budget_tier: "",
         willing_to_travel: false,
         remote_capable: false,
-        has_own_equipment: false,
-        narrative_style: [],
-        shooting_style: [],
-        color_philosophy: [],
-        works_with_actors_approach: [],
-        visual_references: [],
+        distribution_experience: false,
         genres: [],
         formats: [],
-        camera_systems: [],
+        funding_sources: [],
+        territories: [],
+        has_distribution_deals: false,
+        has_broadcast_relationships: false,
+        has_streaming_relationships: false,
+        has_completion_bond_experience: false,
+        has_co_production_experience: false,
         years_experience: "",
+        largest_budget_managed: "",
+        largest_crew_managed: "",
         has_feature_credits: false,
         has_tv_credits: false,
         has_theatre_credits: false,
         has_documentary_credits: false,
         has_commercial_credits: false,
-        has_music_video_credits: false,
-        longest_project_runtime_mins: "",
-        largest_crew_managed: "",
-        past_budget_max: "",
         has_production_company: false,
         production_company_name: "",
         reel_url: "",
         imdb_url: "",
         past_works: [],
-        awards: [],
-        festival_selections: [],
         profile_links: {
             linkedin: "",
             instagram: "",
@@ -158,7 +144,7 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
         },
     });
 
-    const set = (key: keyof DirectorData, value: any) => {
+    const set = (key: keyof ProducerData, value: any) => {
         setForm((prev) => ({ ...prev, [key]: value }));
     };
 
@@ -167,17 +153,15 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
         setError("");
         setIsLoading(true);
         try {
-            await api.post("/api/v1/profile/director/", {
+            await api.post("/api/v1/profile/producer/", {
                 ...form,
                 years_experience: form.years_experience
                     ? parseInt(form.years_experience)
                     : null,
-                longest_project_runtime_mins: form.longest_project_runtime_mins
-                    ? parseInt(form.longest_project_runtime_mins)
-                    : null,
                 largest_crew_managed: form.largest_crew_managed
                     ? parseInt(form.largest_crew_managed)
                     : null,
+                largest_budget_managed: form.largest_budget_managed || null,
                 profile_links: Object.fromEntries(
                     Object.entries(form.profile_links).filter(([_, v]) => v !== "")
                 ),
@@ -186,17 +170,13 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
         } catch (err: any) {
             const data = err?.response?.data;
             if (data) {
-                // Find the first field error and show it
                 const firstKey = Object.keys(data).find((k) => k !== "message");
                 if (firstKey) {
                     const fieldError = data[firstKey];
-                    // Handle both array errors (["msg"]) and indexed errors ({"0": ["msg"]})
                     if (Array.isArray(fieldError)) {
                         setError(`${firstKey}: ${fieldError[0]}`);
                     } else if (typeof fieldError === "object") {
-                        const firstIndexError = Object.values(
-                            fieldError,
-                        )[0] as string[];
+                        const firstIndexError = Object.values(fieldError)[0] as string[];
                         setError(`${firstKey}: ${firstIndexError[0]}`);
                     } else {
                         setError(String(fieldError));
@@ -224,7 +204,7 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     marginBottom: "12px",
                 }}
             >
-                director profile
+                producer profile
             </p>
 
             <h1
@@ -237,7 +217,7 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     lineHeight: 1.1,
                 }}
             >
-                Build your profile
+                Build your profile.
             </h1>
 
             <p
@@ -269,28 +249,41 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
 
             <form
                 onSubmit={handleSubmit}
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "28px",
-                }}
+                style={{ display: "flex", flexDirection: "column", gap: "28px" }}
             >
-                {/*Core*/}
+                {/* Core — always visible */}
                 <Dropdown
                     options={choices.union_status}
                     value={form.union_status}
                     onChange={(v) => set("union_status", String(v))}
-                    placeholder="Union Status"
+                    placeholder="Union / Guild Status"
                     optional
                 />
-
+                <Dropdown
+                    options={choices.producer_type}
+                    value={form.producer_type}
+                    onChange={(v) => set("producer_type", String(v))}
+                    placeholder="Producer Type"
+                    optional
+                />
                 <MultiDropdownTagInput
                     label="Languages"
                     options={choices.languages}
                     value={form.languages}
                     onChange={(v) => set("languages", v)}
                 />
-
+                <MultiDropdownTagInput
+                    label="Genres"
+                    options={choices.genre_choices}
+                    value={form.genres}
+                    onChange={(v) => set("genres", v)}
+                />
+                <MultiDropdownTagInput
+                    label="Formats"
+                    options={choices.format_choices}
+                    value={form.formats}
+                    onChange={(v) => set("formats", v)}
+                />
                 <Toggle
                     label="Willing to Travel"
                     value={form.willing_to_travel}
@@ -301,141 +294,88 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     value={form.remote_capable}
                     onChange={(v) => set("remote_capable", v)}
                 />
-                <Toggle
-                    label="Has Own Equipment"
-                    value={form.has_own_equipment}
-                    onChange={(v) => set("has_own_equipment", v)}
-                />
 
-                {/*Style & Creative*/}
-                <Collapsible title="Style & Creative">
-                    <MultiDropdownTagInput
-                        label="Narrative Style"
-                        options={choices.narrative_style}
-                        value={form.narrative_style}
-                        onChange={(v) => set("narrative_style", v)}
+                {/* Finance & Business */}
+                <Collapsible title="Finance & Business">
+                    <Dropdown
+                        options={choices.budget_tier}
+                        value={form.budget_tier}
+                        onChange={(v) => set("budget_tier", String(v))}
+                        placeholder="Typical Budget Tier"
+                        optional
+                    />
+                    <Dropdown
+                        options={choices.budget_tier}
+                        value={form.largest_budget_managed}
+                        onChange={(v) => set("largest_budget_managed", String(v))}
+                        placeholder="Largest Budget Managed"
+                        optional
                     />
                     <MultiDropdownTagInput
-                        label="Shooting Style"
-                        options={choices.shooting_style}
-                        value={form.shooting_style}
-                        onChange={(v) => set("shooting_style", v)}
-                    />
-                    <MultiDropdownTagInput
-                        label="Color Philosophy"
-                        options={choices.color_philosophy}
-                        value={form.color_philosophy}
-                        onChange={(v) => set("color_philosophy", v)}
-                    />
-                    <MultiDropdownTagInput
-                        label="Works With Actors"
-                        options={choices.works_with_actors_approach}
-                        value={form.works_with_actors_approach}
-                        onChange={(v) => set("works_with_actors_approach", v)}
+                        label="Funding Sources"
+                        options={choices.funding_sources}
+                        value={form.funding_sources}
+                        onChange={(v) => set("funding_sources", v)}
                     />
                     <TagInput
-                        label="Visual References"
-                        value={form.visual_references}
-                        onChange={(v) => set("visual_references", v)}
+                        label="Territories"
+                        value={form.territories}
+                        onChange={(v) => set("territories", v)}
+                    />
+                    <Toggle
+                        label="Distribution Experience"
+                        value={form.distribution_experience}
+                        onChange={(v) => set("distribution_experience", v)}
+                    />
+                    <Toggle
+                        label="Has Distribution Deals"
+                        value={form.has_distribution_deals}
+                        onChange={(v) => set("has_distribution_deals", v)}
+                    />
+                    <Toggle
+                        label="Broadcast Relationships"
+                        value={form.has_broadcast_relationships}
+                        onChange={(v) => set("has_broadcast_relationships", v)}
+                    />
+                    <Toggle
+                        label="Streaming Relationships"
+                        value={form.has_streaming_relationships}
+                        onChange={(v) => set("has_streaming_relationships", v)}
+                    />
+                    <Toggle
+                        label="Completion Bond Experience"
+                        value={form.has_completion_bond_experience}
+                        onChange={(v) => set("has_completion_bond_experience", v)}
+                    />
+                    <Toggle
+                        label="Co-Production Experience"
+                        value={form.has_co_production_experience}
+                        onChange={(v) => set("has_co_production_experience", v)}
                     />
                 </Collapsible>
 
-                {/*Genres, Formats & Camera*/}
-                <Collapsible title="Genres, Formats & Camera">
-                    <MultiDropdownTagInput
-                        label="Genres"
-                        options={choices.genre_choices}
-                        value={form.genres}
-                        onChange={(v) => set("genres", v)}
-                    />
-                    <MultiDropdownTagInput
-                        label="Formats"
-                        options={choices.format_choices}
-                        value={form.formats}
-                        onChange={(v) => set("formats", v)}
-                    />
-                    <MultiDropdownTagInput
-                        label="Camera Systems"
-                        options={choices.camera_systems}
-                        value={form.camera_systems}
-                        onChange={(v) => set("camera_systems", v)}
-                    />
-                </Collapsible>
-
-                {/*Experience*/}
+                {/* Experience */}
                 <Collapsible title="Experience">
-                    <div style={{ display: "flex", gap: "16px" }}>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                                flex: 1,
-                            }}
-                        >
+                    <div style={{ display: "flex", gap: "24px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
                             <label style={labelStyle}>Years Experience</label>
                             <input
                                 type="number"
                                 value={form.years_experience}
-                                onChange={(e) =>
-                                    set("years_experience", e.target.value)
-                                }
+                                onChange={(e) => set("years_experience", e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                                flex: 1,
-                            }}
-                        >
-                            <label style={labelStyle}>
-                                Largest Crew Managed
-                            </label>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+                            <label style={labelStyle}>Largest Crew Managed</label>
                             <input
                                 type="number"
                                 value={form.largest_crew_managed}
-                                onChange={(e) =>
-                                    set("largest_crew_managed", e.target.value)
-                                }
+                                onChange={(e) => set("largest_crew_managed", e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
                     </div>
-
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "8px",
-                        }}
-                    >
-                        <label style={labelStyle}>
-                            Longest Project Runtime (mins)
-                        </label>
-                        <input
-                            type="number"
-                            value={form.longest_project_runtime_mins}
-                            onChange={(e) =>
-                                set(
-                                    "longest_project_runtime_mins",
-                                    e.target.value,
-                                )
-                            }
-                            style={inputStyle}
-                        />
-                    </div>
-
-                    <Dropdown
-                        options={choices.past_budget_max}
-                        value={form.past_budget_max}
-                        onChange={(v) => set("past_budget_max", String(v))}
-                        placeholder="Past Budget Max"
-                        optional
-                    />
-
                     <Toggle
                         label="Feature Credits"
                         value={form.has_feature_credits}
@@ -461,28 +401,9 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                         value={form.has_commercial_credits}
                         onChange={(v) => set("has_commercial_credits", v)}
                     />
-                    <Toggle
-                        label="Music Video Credits"
-                        value={form.has_music_video_credits}
-                        onChange={(v) => set("has_music_video_credits", v)}
-                    />
                 </Collapsible>
 
-                {/*Awards & Recognition*/}
-                <Collapsible title="Awards & Recognition">
-                    <TagInput
-                        label="Awards"
-                        value={form.awards}
-                        onChange={(v) => set("awards", v)}
-                    />
-                    <TagInput
-                        label="Festival Selections"
-                        value={form.festival_selections}
-                        onChange={(v) => set("festival_selections", v)}
-                    />
-                </Collapsible>
-
-                {/*Production Company*/}
+                {/* Production Company */}
                 <Collapsible title="Production Company">
                     <Toggle
                         label="Has Production Company"
@@ -490,55 +411,30 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                         onChange={(v) => set("has_production_company", v)}
                     />
                     {form.has_production_company && (
-                        <div
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                            }}
-                        >
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label style={labelStyle}>Company Name</label>
                             <input
                                 type="text"
                                 value={form.production_company_name}
-                                onChange={(e) =>
-                                    set(
-                                        "production_company_name",
-                                        e.target.value,
-                                    )
-                                }
+                                onChange={(e) => set("production_company_name", e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
                     )}
                 </Collapsible>
 
-                {/*Links*/}
+                {/* Links */}
                 <Collapsible title="Links & Credits">
                     {[
                         { label: "Reel URL", key: "reel_url", type: "url" },
                         { label: "IMDb URL", key: "imdb_url", type: "url" },
                     ].map(({ label, key, type }) => (
-                        <div
-                            key={key}
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                            }}
-                        >
+                        <div key={key} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label style={labelStyle}>{label}</label>
                             <input
                                 type={type}
-                                value={
-                                    form[key as keyof DirectorData] as string
-                                }
-                                onChange={(e) =>
-                                    set(
-                                        key as keyof DirectorData,
-                                        e.target.value,
-                                    )
-                                }
+                                value={form[key as keyof ProducerData] as string}
+                                onChange={(e) => set(key as keyof ProducerData, e.target.value)}
                                 style={inputStyle}
                             />
                         </div>
@@ -571,15 +467,8 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                     ))}
                 </Collapsible>
 
-                {/*Actions*/}
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "12px",
-                        marginTop: "8px",
-                    }}
-                >
+                {/* Actions */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "8px" }}>
                     <button
                         type="submit"
                         disabled={isLoading}
@@ -588,12 +477,8 @@ export default function DirectorDetailsForm({ onComplete, onSkip }: Props) {
                             fontSize: "11px",
                             letterSpacing: "0.2em",
                             textTransform: "uppercase",
-                            background: isLoading
-                                ? "transparent"
-                                : "var(--gold-accent)",
-                            color: isLoading
-                                ? "var(--cream-muted)"
-                                : "var(--ink)",
+                            background: isLoading ? "transparent" : "var(--gold-accent)",
+                            color: isLoading ? "var(--cream-muted)" : "var(--ink)",
                             border: "1px solid var(--gold-accent)",
                             padding: "16px 32px",
                             cursor: isLoading ? "not-allowed" : "pointer",

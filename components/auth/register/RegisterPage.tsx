@@ -14,6 +14,9 @@ import RoleSelectForm from "./RoleSelectForm";
 
 import DirectorDetailsForm from "./DirectorDetailsForm";
 import ActorDetailsForm from "./ActorDetailsForm";
+import ProducerDetailsForm from "./ProducerDetailsForm";
+import CinematographerDetailsForm from "./CinematographerDetailsForm";
+import ScreenwriterDetailsForm from "./ScreenwriterDetailsForm";
 
 export type BasicDetails = {
     email: string;
@@ -229,13 +232,36 @@ export default function RegisterPage() {
                         />
                     )}
 
-                    {/* TODO: add other role forms here as they are built */}
                     {step === "profile" && selectedRole === "director" && (
                         <DirectorDetailsForm
                             onComplete={handleProfileComplete}
                             onSkip={handleSkip}
                         />
                     )}
+
+                    {step === "profile" && selectedRole === "producer" && (
+                        <ProducerDetailsForm
+                            onComplete={handleProfileComplete}
+                            onSkip={handleSkip}
+                        />
+                    )}
+
+                    {step === "profile" && selectedRole === "cinematographer" && (
+                        <CinematographerDetailsForm
+                            onComplete={handleProfileComplete}
+                            onSkip={handleSkip}
+                        />
+                    )}
+
+                    {step === "profile" && selectedRole === "screenwriter" && (
+                        <ScreenwriterDetailsForm
+                            onComplete={handleProfileComplete}
+                            onSkip={handleSkip}
+                        />
+                    )}
+
+                    {/* TODO: add other role forms here as they are built */}
+
                 </div>
             </div>
         </main>
