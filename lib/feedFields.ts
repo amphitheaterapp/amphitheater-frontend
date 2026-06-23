@@ -92,7 +92,117 @@ export const DIRECTOR_FIELD_GROUPS: FieldGroup[] = [
     },
 ];
 
+export const PRODUCER_FIELD_GROUPS: FieldGroup[] = [
+    {
+        title: "Production",
+        fields: [
+            "producer_type", "genres", "formats",
+            "funding_sources", "territories", "budget_tier",
+        ],
+    },
+    {
+        title: "Credits",
+        fields: [
+            "has_feature_credits", "has_tv_credits", "has_theatre_credits",
+            "has_documentary_credits", "has_commercial_credits",
+            "years_experience", "largest_crew_managed", "largest_budget_managed",
+        ],
+    },
+    {
+        title: "Industry",
+        fields: [
+            "has_distribution_deals", "has_broadcast_relationships",
+            "has_streaming_relationships", "has_completion_bond_experience",
+            "has_co_production_experience", "distribution_experience",
+            "has_production_company", "production_company_name",
+        ],
+    },
+    {
+        title: "Booking",
+        fields: ["union_status", "willing_to_travel", "remote_capable"],
+    },
+    {
+        title: "Languages & Work",
+        fields: ["languages", "past_works"],
+    },
+];
+ 
+export const CINEMATOGRAPHER_FIELD_GROUPS: FieldGroup[] = [
+    {
+        title: "Style",
+        fields: [
+            "genres", "formats", "lighting_style", "shooting_style",
+            "color_philosophy", "visual_references",
+        ],
+    },
+    {
+        title: "Equipment & Technical",
+        fields: [
+            "camera_systems", "lens_experience",
+            "owns_camera", "owns_lighting", "owns_grip_equipment",
+            "steadicam_certified", "underwater_certified",
+            "drone_licensed", "drone_systems",
+        ],
+    },
+    {
+        title: "Credits",
+        fields: [
+            "has_feature_credits", "has_tv_credits", "has_theatre_credits",
+            "has_documentary_credits", "has_commercial_credits",
+            "has_music_video_credits", "years_experience",
+            "largest_crew_managed",
+        ],
+    },
+    {
+        title: "Recognition",
+        fields: ["awards", "festival_selections"],
+    },
+    {
+        title: "Booking",
+        fields: ["union_status", "past_budget_max", "willing_to_travel", "remote_capable"],
+    },
+    {
+        title: "Languages & Work",
+        fields: ["languages", "past_works"],
+    },
+];
+ 
+export const SCREENWRITER_FIELD_GROUPS: FieldGroup[] = [
+    {
+        title: "Style",
+        fields: [
+            "genres", "formats", "writing_style", "structural_approach",
+            "thematic_interests", "influences",
+        ],
+    },
+    {
+        title: "Credits & Scripts",
+        fields: [
+            "has_feature_credits", "has_tv_credits", "has_theatre_credits",
+            "has_documentary_credits", "has_short_credits", "has_podcast_credits",
+            "has_produced_credits", "has_spec_scripts", "adaptation_experience",
+            "has_optioned_scripts", "has_sold_scripts", "years_experience",
+        ],
+    },
+    {
+        title: "Recognition",
+        fields: ["awards", "fellowships"],
+    },
+    {
+        title: "Booking",
+        fields: ["guild_status", "representation", "remote_capable"],
+    },
+    {
+        title: "Languages & Work",
+        fields: ["languages", "past_works"],
+    },
+];
+
 export const FIELD_GROUPS_BY_ROLE: Record<string, FieldGroup[]> = {
     actor: ACTOR_FIELD_GROUPS,
     director: DIRECTOR_FIELD_GROUPS,
+    producer: PRODUCER_FIELD_GROUPS,
+    cinematographer: CINEMATOGRAPHER_FIELD_GROUPS,
+    screenwriter: SCREENWRITER_FIELD_GROUPS,
+
 };

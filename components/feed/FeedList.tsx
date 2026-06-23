@@ -13,7 +13,7 @@ export default function FeedList({ selectedUserId, onSelect }: Props) {
     // 50km is the real default, not the 5000km used earlier purely to
     // surface results during local testing with sparse seed data.
     const { items, status, exhausted, loadMore, removeItem } = useFeedList(
-        ["actor", "director"],
+        ["actor", "director", "producer", "cinematographer", "screenwriter"],
         50,
     );
     const sentinelRef = useRef<HTMLDivElement>(null);
