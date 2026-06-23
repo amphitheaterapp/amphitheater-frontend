@@ -92,9 +92,22 @@ export default function FeedCard({ entry, selected, onSelect, onPass }: Props) {
                         fontSize: "13px",
                         color: "var(--gold-accent)",
                         flexShrink: 0,
+                        overflow: "hidden",
                     }}
                 >
-                    {getInitials(data.name)}
+                    {data.avatar_url ? (
+                        <img
+                            src={data.avatar_url}
+                            alt={data.name}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                            }}
+                        />
+                    ) : (
+                        getInitials(data.name)
+                    )}
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>

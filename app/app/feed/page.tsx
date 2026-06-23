@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import FeedList from "@/components/feed/FeedList";
-import DetailPanel from "@/components/feed/DetailPanal";
+import DetailPanel from "@/components/feed/detailed/DetailPanal";
 
 export default function FeedPage() {
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);

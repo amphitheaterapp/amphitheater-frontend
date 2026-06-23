@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { MessagingProvider } from "@/context/MessagingContext";
-import Navbar from "./Navbar";
+import Navbar from "@/components/app-shell/navbar/Navbar";
 import BubbleDock from "@/components/messaging/BubbleDock";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
