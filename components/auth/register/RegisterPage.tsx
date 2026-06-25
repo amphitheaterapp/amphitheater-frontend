@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { uploadAvatar } from "@/lib/avatarUpload";
@@ -51,9 +51,11 @@ export default function RegisterPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const justRegistered = useRef(false);
+
     // route to feed if user already logged in
     useEffect(() => {
-        if (!isLoading && user) {
+        if (!isLoading && user && !justRegistered.current) {
             router.push("/app/feed");
         }
     }, [user, isLoading, router]);
@@ -68,6 +70,8 @@ export default function RegisterPage() {
         setIsLoading(true);
         try {
             await register(data);
+
+            justRegistered.current = true;
 
             if (avatarFile) {
                 try {
@@ -267,12 +271,13 @@ export default function RegisterPage() {
                         />
                     )}
 
-                    {step === "profile" && selectedRole === "cinematographer" && (
-                        <CinematographerDetailsForm
-                            onComplete={handleProfileComplete}
-                            onSkip={handleSkip}
-                        />
-                    )}
+                    {step === "profile" &&
+                        selectedRole === "cinematographer" && (
+                            <CinematographerDetailsForm
+                                onComplete={handleProfileComplete}
+                                onSkip={handleSkip}
+                            />
+                        )}
 
                     {step === "profile" && selectedRole === "screenwriter" && (
                         <ScreenwriterDetailsForm
@@ -282,7 +287,6 @@ export default function RegisterPage() {
                     )}
 
                     {/* TODO: add other role forms here as they are built */}
-
                 </div>
             </div>
         </main>
